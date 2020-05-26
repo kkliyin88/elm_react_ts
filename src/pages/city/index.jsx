@@ -1,8 +1,10 @@
 //about.js
 import React from 'react';
 import './index.css';
-import {currentcity, searchplace} from '../../service/index.js';
+import { searchplace} from '../../service/index.js';
+import {getStore, setStore, removeStore} from '../../config/mUtils'
 import Header from '../../components/header/index.jsx';
+import createHistory from 'history/createBrowserHistory';
 export default class City extends React.Component {
   constructor(props) {
       super(props);
@@ -16,7 +18,12 @@ export default class City extends React.Component {
         placeNone: false, // 搜索无结果，显示提示信息
       }
   }
-  initData(){
+  clearAll(){ //清除历史搜索记录
+    removeStore('placeHistory');
+    this.initData();
+  }
+  
+  initData(){ //初始化所选择的城市，如果没有默认深圳 初始化搜索历史记录
     if(this.props.location.state){
       this.setState({
         cityid:this.props.location.state.id,
@@ -28,6 +35,16 @@ export default class City extends React.Component {
         cityname:'深圳'
       })
     }
+    //获取本地查询记录
+    if (getStore('placeHistory')) {
+      this.setState({
+        placelist:JSON.parse(getStore('placeHistory'))
+      })
+    }else{
+      this.setState({
+        placelist:[]
+      })
+    } 
   }
   inptChange(event){
     this.setState({
@@ -51,7 +68,27 @@ export default class City extends React.Component {
       }
   }
   nextpage(index,geohash){
-
+    let history = getStore('placeHistory');
+    let choosePlace = this.state.placelist[index];
+    let  placeHistory = []
+    if (history) { //
+        let checkrepeat = false;
+        placeHistory = JSON.parse(history)
+        placeHistory.forEach(item => {
+            if (item.geohash === geohash) {
+                checkrepeat = true;
+            }
+        })
+        if (!checkrepeat) {
+          placeHistory.push(choosePlace)
+        }
+    }else {
+        placeHistory.push(choosePlace)
+    }
+    setStore('placeHistory',placeHistory)
+    // this.props.history.push({pathname:'/msite', query:{geohash}});
+    // let history1 = createHistory(); //创建历史对象
+    // history1.push('/msite', { some:geohash })
   }
   render() {
     return (
@@ -79,6 +116,9 @@ export default class City extends React.Component {
           </ul>
           {
             this.state.placeNone?<div className="search_none_place">抱歉！无搜索结果</div>:''
+          }
+          {
+           this.state.placelist.length? <footer v-if="" className="clear_all_history" onClick={this.clearAll}>清空所有</footer>:''
           }
 		</div>
 	)
