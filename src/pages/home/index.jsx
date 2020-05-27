@@ -1,8 +1,11 @@
 //home.js
 import React from "react";
 import { Link } from "react-router-dom";
-import { hotcity, groupcity } from "../../service/index.js";
 import "./index.css";
+import { hotcity, groupcity } from "../../service/index.js";
+import store from '../../redux/store';
+import {change_city} from '../../redux/action';
+
 export default class Home extends React.Component {
   constructor(props) {
     super(props);
@@ -33,6 +36,12 @@ export default class Home extends React.Component {
     this.setState({
       groupcity: sortobj,
     });
+  }
+  selectCity(city){
+    // 存储当前选择的城市
+    let action = change_city(city); 
+    store.dispatch(action);
+    this.props.history.push({pathname:'/city'});
   }
   componentDidMount() {
     this.getCityData();
@@ -69,10 +78,10 @@ export default class Home extends React.Component {
                   <ul className="groupcity_name_container citylistul clear">
                     {this.state.groupcity[key].map((item, ii) => {
                       return (
-                        <li key={ii} className="ellipsis">
-                          <Link to={{ pathname: "/city/", state: item}}>
+                        <li onClick={this.selectCity.bind(this,item)} key={ii} className="ellipsis" >
+                          {/* <Link onClick={this.selectCity.bind(this,item)}  to={{ pathname: "/city/", state: item}}> */}
                             <span>{item.name}</span>
-                          </Link>
+                          {/* </Link> */}
                         </li>
                       );
                     })}

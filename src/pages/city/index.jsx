@@ -5,6 +5,8 @@ import { searchplace} from '../../service/index.js';
 import {getStore, setStore, removeStore} from '../../config/mUtils'
 import Header from '../../components/header/index.jsx';
 import createHistory from 'history/createBrowserHistory';
+import store from '../../redux/store';
+import {change_city,change_place} from '../../redux/action';
 export default class City extends React.Component {
   constructor(props) {
       super(props);
@@ -22,19 +24,12 @@ export default class City extends React.Component {
     removeStore('placeHistory');
     this.initData();
   }
-  
   initData(){ //初始化所选择的城市，如果没有默认深圳 初始化搜索历史记录
-    if(this.props.location.state){
       this.setState({
-        cityid:this.props.location.state.id,
-        cityname:this.props.location.state.name
+        cityid:store.getState().city.id,
+        cityname:store.getState().city.name
       })
-    }else{
-      this.setState({
-        cityid: 11,
-        cityname:'深圳'
-      })
-    }
+      console.log('state',this.state)
     //获取本地查询记录
     if (getStore('placeHistory')) {
       this.setState({
@@ -67,15 +62,17 @@ export default class City extends React.Component {
           })
       }
   }
-  nextpage(index,geohash){
+  nextpage(index,item){
+    console.log('item',item);
+    
     let history = getStore('placeHistory');
     let choosePlace = this.state.placelist[index];
     let  placeHistory = []
     if (history) { //
         let checkrepeat = false;
         placeHistory = JSON.parse(history)
-        placeHistory.forEach(item => {
-            if (item.geohash === geohash) {
+        placeHistory.forEach(itemm => {
+            if (itemm.geohash === item.geohash) {
                 checkrepeat = true;
             }
         })
@@ -85,10 +82,11 @@ export default class City extends React.Component {
     }else {
         placeHistory.push(choosePlace)
     }
-    setStore('placeHistory',placeHistory)
-    // this.props.history.push({pathname:'/msite', query:{geohash}});
-    // let history1 = createHistory(); //创建历史对象
-    // history1.push('/msite', { some:geohash })
+    setStore('placeHistory',placeHistory);
+    
+    let action = change_place(item) //存储当前的place信息 msiteye页面使用
+    store.dispatch(action);
+    this.props.history.push({pathname:'/msite', state:item.geohash});
   }
   render() {
     return (
@@ -107,7 +105,7 @@ export default class City extends React.Component {
           <ul className="getpois_ul">
             {this.state.placelist.map((item,i)=>{
               return (
-                <li key={i} onClick={this.nextpage(i,item.geohash)}>
+                <li key={i} onClick={this.nextpage.bind(this,i,item)}>
                    <h4 className="pois_name ellipsis">{item.name}</h4>
                    <p className="pois_address ellipsis">{item.address}</p>
                 </li>
@@ -118,7 +116,7 @@ export default class City extends React.Component {
             this.state.placeNone?<div className="search_none_place">抱歉！无搜索结果</div>:''
           }
           {
-           this.state.placelist.length? <footer v-if="" className="clear_all_history" onClick={this.clearAll}>清空所有</footer>:''
+           this.state.placelist.length? <footer className="clear_all_history" onClick={this.clearAll.bind}>清空所有</footer>:''
           }
 		</div>
 	)
