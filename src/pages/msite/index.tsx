@@ -6,8 +6,6 @@ import store from '../../redux/store';
 export default class Msite extends React.Component {
   constructor(props:Object) {
     super(props);
-    console.log('props_msite',props);
-    
     this.state = {
       geohash: '', // city页面传递过来的地址geohash
       msiteTitle: '请选择地址...', // msite页面头部标题
@@ -17,7 +15,6 @@ export default class Msite extends React.Component {
     }
   } 
   componentDidMount() {
-    console.log('store_msite',store.getState());
     
   } 
   render() {

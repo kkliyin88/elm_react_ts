@@ -16,7 +16,7 @@ export default class App extends React.Component <any, any>{
          <HashRouter>
           <div>
           <Route exact path="/about" component={About}></Route>
-            <Route exact path="/home" component={Home}></Route>
+            <Route exact path="/" component={Home}></Route>
             <Route exact path="/city" component={City}></Route>
             <Route exact path="/msite" component={Msite}></Route>
           </div>

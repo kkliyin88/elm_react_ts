@@ -1,13 +1,13 @@
 
 import  React from 'react';
-// import './index.css';
+import './index.css';
 import {shopList} from '../../service'
 import {showBack, animate} from '../../service/mUtils'
 // import {loadMore, getImgPath} from '../mixin'
 // import loading from './common/loading'
 // import ratingStar from './common/ratingStar'
 import store from '../../redux/store';
-const imgBaseUrl = '//elm.cangdu.org/img/'
+const imgBaseUrl = '/img/'
 export default class ShopList extends React.Component {
   constructor(props) {
     super(props);
@@ -27,71 +27,107 @@ export default class ShopList extends React.Component {
     this.setState({
       shopListArr:res
     })
-    console.log('state111',this.state);
   }
-
+  zhunshi(supports){
+    let zhunStatus;
+    if ((supports instanceof Array) && supports.length) {
+       supports.forEach(item => {
+         if (item.icon_name === '准') {
+           zhunStatus = true;
+         }
+       })
+    }else{
+      zhunStatus = false;
+    }
+    return zhunStatus
+  }
   componentDidMount() {
     this.getShopList();
   }
   render() {
     return (
       <div className="shoplist_container">
-          {this.state.shopListArr}
-          {/* <ul>
-            
+         {this.state.shopListArr.length>0?<ul>
             {this.state.shopListArr.map((item,index)=>{
               return (
-                <li></li>
+                <li  className="shop_li" key={index}>
+                   <section>
+                    <img src={`${imgBaseUrl}${item.image_path}`} className="shop_img" />
+                  </section>
+                  <hgroup className="shop_right">
+                    <header className="shop_detail_header">
+                      <h4 className='shop_title ellipsis'>{item.name}</h4>
+                      <ul className="shop_detail_ul">
+                        {
+                          item.supports.map((item2,index2)=>{
+                            return <li key={index2} className="supports">{item.icon_name}</li>
+                          })
+                        }
+                    </ul>
+                    </header>
+                    <h5 className="rating_order_num">
+                      <section className="rating_order_num_left">
+                        <section className="rating_section">
+                          {/* <rating-star :rating='item.rating'></rating-star> */}
+                          <span className="rating_num">{item.rating}</span>
+                        </section>
+                        <section className="order_section">
+                          月售{item.recent_order_num}单
+                        </section>
+                      </section>
+                      <section className="rating_order_num_right">
+                        {
+                           item.delivery_mode?<span className="delivery_style delivery_left">{item.delivery_mode.text}</span>:''
+                        }
+                        {
+                         this.zhunshi(item.supports)? <span className="delivery_style delivery_right">准时达</span>:''
+                        }
+                      </section>
+                    </h5>
+                    <h5 className="fee_distance">
+                      <p className="fee">
+                        ¥{item.float_minimum_order_amount}起送
+                        <span class="segmentation">/</span>
+                        {item.piecewise_agent_fee.tips}
+                      </p>
+                      <p className="distance_time">
+                        {Number(item.distance)?<span>{item.distance > 1000? (item.distance/1000).toFixed(2) + 'km': item.distance + 'm'}
+                          <span className="segmentation">/</span>
+                        </span>:''}
+                        <span v-else>{item.distance}</span>
+                        <span className="segmentation">/</span>
+                        <span className="order_time">{item.order_lead_time}</span>
+                      </p>
+                    </h5>
+                  </hgroup>
+                </li>
               )
             })}
-          </ul> */}
+          </ul>:''}
+          {
+            this.state.shopListArr.length<1?<ul v-else className="animation_opactiy">
+              {new Array(10).map((item,i)=>{
+                return (
+                  <li className="list_back_li"  key={i}>
+                    <img src="../../images/shopback.svg" className="list_back_svg" />
+                  </li> 
+                )
+              })}
+           
+          </ul>:''
+          }
+          
          {/* {
            <div class="shoplist_container">
            <ul v-load-more="loaderMore" v-if="shopListArr.length" type="1">
              <router-link :to="{path: 'shop', query:{geohash, id: item.id}}" v-for="item in shopListArr" tag='li' :key="item.id" class="shop_li">
-               <section>
-                 <img :src="imgBaseUrl + item.image_path" class="shop_img">
-               </section>
+             
                <hgroup class="shop_right">
-                 <header class="shop_detail_header">
-                   <h4 :class="item.is_premium? 'premium': ''" class="" class="shop_title ellipsis">{{item.name}}</h4>
-                   <ul class="shop_detail_ul">
-                     <li v-for="item in item.supports" :key="item.id" class="supports">{{item.icon_name}}</li>
-                   </ul>
-                 </header>
-                 <h5 class="rating_order_num">
-                   <section class="rating_order_num_left">
-                     <section class="rating_section">
-                       <rating-star :rating='item.rating'></rating-star>
-                       <span class="rating_num">{{item.rating}}</span>
-                     </section>
-                     <section class="order_section">
-                       月售{{item.recent_order_num}}单
-                     </section>
-                   </section>
-                   <section class="rating_order_num_right">
-                     <span class="delivery_style delivery_left" v-if="item.delivery_mode">{{item.delivery_mode.text}}</span>
-                     <span class="delivery_style delivery_right" v-if="zhunshi(item.supports)">准时达</span>
-                   </section>
-                 </h5>
-                 <h5 class="fee_distance">
-                   <p class="fee">
-                     ¥{{item.float_minimum_order_amount}}起送
-                     <span class="segmentation">/</span>
-                     {{item.piecewise_agent_fee.tips}}
-                   </p>
-                   <p class="distance_time">
-                     <span v-if="Number(item.distance)">{{item.distance > 1000? (item.distance/1000).toFixed(2) + 'km': item.distance + 'm'}}
-                       <span class="segmentation">/</span>
-                     </span>
-                     <span v-else>{{item.distance}}</span>
-                     <span class="segmentation">/</span>
-                     <span class="order_time">{{item.order_lead_time}}</span>
-                   </p>
-                 </h5>
+                
                </hgroup>
              </router-link>
            </ul>
+
            <ul v-else class="animation_opactiy">
              <li class="list_back_li" v-for="item in 10" :key="item">
                <img src="../../images/shopback.svg" class="list_back_svg">
