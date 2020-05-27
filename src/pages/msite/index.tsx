@@ -1,6 +1,8 @@
 //about.js
 import * as React from 'react';
 import './index.css';
+import ShopList from '../../components/shopList/index.jsx';
+import store from '../../redux/store';
 export default class Msite extends React.Component {
   constructor(props:Object) {
     super(props);
@@ -15,11 +17,17 @@ export default class Msite extends React.Component {
     }
   } 
   componentDidMount() {
+    console.log('store_msite',store.getState());
     
   } 
   render() {
-    return (<h1>
-      欢迎，这里是msite
-    </h1>)
+    return (
+      <section>
+        <ShopList></ShopList>
+        <h1>
+          欢迎，这里是msite
+        </h1>
+      </section>
+    )
   }
 }

@@ -8,7 +8,7 @@ const change_city = (value)=>{
 //修改当前所在的城市具体位置信息
 const change_place = (value)=>{
     return {
-        type:'change_city',
+        type:'change_place',
         value:value
     }
 }

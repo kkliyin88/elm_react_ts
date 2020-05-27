@@ -7,6 +7,7 @@ import Header from '../../components/header/index.jsx';
 import createHistory from 'history/createBrowserHistory';
 import store from '../../redux/store';
 import {change_city,change_place} from '../../redux/action';
+
 export default class City extends React.Component {
   constructor(props) {
       super(props);

@@ -12,7 +12,7 @@ const reducer = (state=initState,action)=>{
             break;
         case 'change_place':
             return {
-                city:action.value
+                place:action.value
             };
             break;           
         default:
