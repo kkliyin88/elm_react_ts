@@ -12,4 +12,10 @@ const change_place = (value)=>{
         value:value
     }
 }
-module.exports = {change_city,change_place}
+const change_shopMsg = (value)=>{
+    return {
+        type:'change_shopMsg',
+        value:value
+    }
+}
+module.exports = {change_city,change_place,change_shopMsg}

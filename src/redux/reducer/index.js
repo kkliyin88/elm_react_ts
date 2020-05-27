@@ -1,6 +1,7 @@
 const initState ={
     city:{id:11,name:'深圳'},//所在城市
-    place:{},//城市所选的具体位置
+    place:{},//城市所选的具体位置,
+   shopMsg:{} //保存门店信息
 }
 const reducer = (state=initState,action)=>{
     console.log('触发了reducer',action)
@@ -13,6 +14,11 @@ const reducer = (state=initState,action)=>{
         case 'change_place':
             return {
                 place:action.value
+            };
+            break; 
+        case 'change_shopMsg':
+            return {
+                shopMsg:action.value
             };
             break;           
         default:

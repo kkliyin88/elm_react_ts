@@ -2,11 +2,9 @@
 import  React from 'react';
 import './index.css';
 import {shopList} from '../../service'
-import {showBack, animate} from '../../service/mUtils'
-// import {loadMore, getImgPath} from '../mixin'
-// import loading from './common/loading'
-// import ratingStar from './common/ratingStar'
+import Start from '../start/index.jsx';
 import store from '../../redux/store';
+import {change_shopMsg} from '../../redux/action';
 const imgBaseUrl = '/img/'
 export default class ShopList extends React.Component {
   constructor(props) {
@@ -27,6 +25,11 @@ export default class ShopList extends React.Component {
     this.setState({
       shopListArr:res
     })
+  }
+  gotoShop(shopMsg){
+    let action = change_shopMsg(shopMsg) //存储门店信息
+    store.dispatch(action)
+    // this.props.history.push({pathname:'/shop'});
   }
   zhunshi(supports){
     let zhunStatus;
@@ -50,7 +53,7 @@ export default class ShopList extends React.Component {
          {this.state.shopListArr.length>0?<ul>
             {this.state.shopListArr.map((item,index)=>{
               return (
-                <li  className="shop_li" key={index}>
+                <li onClick={this.gotoShop.bind(this,item)} className="shop_li" key={index} >
                    <section>
                     <img src={`${imgBaseUrl}${item.image_path}`} className="shop_img" />
                   </section>
@@ -67,8 +70,11 @@ export default class ShopList extends React.Component {
                     </header>
                     <h5 className="rating_order_num">
                       <section className="rating_order_num_left">
-                        <section className="rating_section">
-                          {/* <rating-star :rating='item.rating'></rating-star> */}
+                        <section className="rating_section" >
+                          <div style={{display:'inlineBlock',marginTop:'-12px'}}>
+                             <Start  startNum={item.rating} style={{color:'red'}} />
+                          </div>
+                        
                           <span className="rating_num">{item.rating}</span>
                         </section>
                         <section className="order_section">
@@ -105,7 +111,7 @@ export default class ShopList extends React.Component {
             })}
           </ul>:''}
           {
-            this.state.shopListArr.length<1?<ul v-else className="animation_opactiy">
+            this.state.shopListArr.length<1?<ul  className="animation_opactiy">
               {new Array(10).map((item,i)=>{
                 return (
                   <li className="list_back_li"  key={i}>
@@ -113,41 +119,9 @@ export default class ShopList extends React.Component {
                   </li> 
                 )
               })}
-           
           </ul>:''
           }
-          
-         {/* {
-           <div class="shoplist_container">
-           <ul v-load-more="loaderMore" v-if="shopListArr.length" type="1">
-             <router-link :to="{path: 'shop', query:{geohash, id: item.id}}" v-for="item in shopListArr" tag='li' :key="item.id" class="shop_li">
-             
-               <hgroup class="shop_right">
-                
-               </hgroup>
-             </router-link>
-           </ul>
-
-           <ul v-else class="animation_opactiy">
-             <li class="list_back_li" v-for="item in 10" :key="item">
-               <img src="../../images/shopback.svg" class="list_back_svg">
-             </li>
-           </ul>
-           <p v-if="touchend" class="empty_data">没有更多了</p>
-           <aside class="return_top" @click="backTop" v-if="showBackStatus">
-             <svg class="back_top_svg">
-               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#backtop"></use>
-             </svg>
-           </aside>
-           <div ref="abc" style="background-color: red;"></div>
-           <transition name="loading">
-             <loading v-show="showLoading"></loading>
-           </transition>
-         </div>
-         } */}
       </div>
-      
-     
   )
   }
 }

@@ -4,7 +4,7 @@ import './index.css';
 import { searchplace} from '../../service/index.js';
 import {getStore, setStore, removeStore} from '../../config/mUtils'
 import Header from '../../components/header/index.jsx';
-import createHistory from 'history/createBrowserHistory';
+// import createHistory from 'history/createBrowserHistory';
 import store from '../../redux/store';
 import {change_city,change_place} from '../../redux/action';
 
@@ -84,7 +84,6 @@ export default class City extends React.Component {
         placeHistory.push(choosePlace)
     }
     setStore('placeHistory',placeHistory);
-    
     let action = change_place(item) //存储当前的place信息 msiteye页面使用
     store.dispatch(action);
     this.props.history.push({pathname:'/msite', state:item.geohash});
