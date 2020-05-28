@@ -34,7 +34,6 @@
                             <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#arrow-left"></use>
                         </svg>
                     </footer>
-
                 </section>
             </header>
             <transition name="fade">

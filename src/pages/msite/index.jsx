@@ -1,11 +1,11 @@
 //about.js
-import * as React from 'react';
+import  React from 'react';
 import './index.css';
 import ShopList from '../../components/shopList/index.jsx';
 import store from '../../redux/store';
 import Header from '../../components/header/index.jsx';
 export default class Msite extends React.Component {
-  constructor(props:Object) {
+  constructor(props) {
     super(props);
     this.state = {
       geohash: '', // city页面传递过来的地址geohash
@@ -16,7 +16,7 @@ export default class Msite extends React.Component {
     }
   } 
   componentDidMount() {
-    console.log('ddddd',store.getState().place.name);
+    console.log('msite_prop',this.props);
     
   } 
   render() {
@@ -28,7 +28,7 @@ export default class Msite extends React.Component {
           </Header>
         </section>
         <section style={{paddingTop:'50px'}}>
-          <ShopList></ShopList>
+          <ShopList history={this.props.history}></ShopList>
         </section>
       </section>
     )

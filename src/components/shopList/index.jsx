@@ -28,8 +28,10 @@ export default class ShopList extends React.Component {
   }
   gotoShop(shopMsg){
     let action = change_shopMsg(shopMsg) //存储门店信息
-    store.dispatch(action)
-    // this.props.history.push({pathname:'/shop'});
+    store.dispatch(action);
+    console.log('history',this.props);
+    
+    this.props.history.push({pathname:'/shop'});
   }
   zhunshi(supports){
     let zhunStatus;
@@ -74,7 +76,6 @@ export default class ShopList extends React.Component {
                           <div style={{display:'inlineBlock',marginTop:'-12px'}}>
                              <Start  startNum={item.rating} style={{color:'red'}} />
                           </div>
-                        
                           <span className="rating_num">{item.rating}</span>
                         </section>
                         <section className="order_section">
