@@ -63,6 +63,23 @@ export default class About extends React.Component {
     })
     console.log('shopDetailData',this.state.shopDetailData)
   }
+  chooseMenu(index){
+    this.setState({
+        menuIndex: index,
+        menuIndexChange: false
+    })
+    //menuIndexChange解决运动时listenScroll依然监听的bug
+    // this.foodScroll.scrollTo(0, -this.shopListTop[index], 400);
+    // this.foodScroll.on('scrollEnd', () => {
+    //     this.menuIndexChange = true;
+    // })
+  }
+  showTitleDetail(index){
+
+  }
+  toggleCartList(){
+
+  }
   componentDidMount() {
     this.initData();
   }
@@ -88,72 +105,116 @@ export default class About extends React.Component {
           </header>
           <transition name="fade-choose">
             <section  className="food_container">
-            
+                <section className="menu_container">
+                    <section className="menu_left" id="wrapper_menu" ref="wrapperMenu">
+                        <ul>
+                            {
+                                this.state.menuList.map((item,index)=>{
+                                    return (
+                                        <li  key={index} className={`menu_left_li ${index === this.state.menuIndex ?'activity_menu' :'' }`}  onClick={this.chooseMenu.bind(this,index)}>
+                                            {item.icon_url?<img src="getImgPath(item.icon_url)" v-if="item.icon_url" />:''}
+                                            <span>{item.name}</span>
+                                            {this.state.categoryNum[index]&&item.type===1?<span className="category_num" >{this.state.categoryNum[index]}</span>:''}
+                                        </li>
+                                    )
+
+                                })
+                                }
+                        </ul>
+                    </section>
+                    <section className="menu_right" ref="menuFoodList">
+                        <ul>
+                            { this.state.menuList.map((item,index)=>{
+                                return (<li key={index}>
+                                    <header className="menu_detail_header">
+                                        <section className="menu_detail_header_left">
+                                            <strong className="menu_item_title">{item.name}</strong>
+                                            <span className="menu_item_description">{item.description}</span>
+                                        </section>
+                                        <span className="menu_detail_header_right" onClick={this.showTitleDetail.bind(this,index)}></span>
+                                    { this.state.TitleDetailIndex==index?<p class="description_tip" >
+                                            <span>{item.name}</span>
+                                            {item.description}
+                                        </p>:''}
+                                    </header>
+                                    {
+                                        item.foods.map((foods,foodindex)=>{
+                                            return (
+                                                <section key={foodindex} className="menu_detail_list" >
+                                                    <div className="menu_detail_link">
+                                                    <section className="menu_food_img">
+                                                        <img src={this.state.imgBaseUrl + foods.image_path} />
+                                                    </section>
+                                                    <section className="menu_food_description">
+                                                        <h3 className="food_description_head">
+                                                            <strong className="description_foodname">{foods.name}</strong>
+                                                            { foods.attributes.length?
+                                                            <ul  className="attributes_ul">
+                                                                {foods.attributes.map((attribute,foodindex)=>{
+                                                                    if(!attribute) return false
+                                                                    return (
+                                                                       <li key={foodindex} className={`${attribute.icon_name === '新'?'attribute_new':''}` }>
+                                                                             <p style={{color:`#${attribute.icon_name} === '新'?'fff':'attribute.icon_color'}` }}>{attribute.icon_name === '新'? '新品':attribute.icon_name}</p>
+                                                                        </li>
+
+                                                                    )
+                                                                })
+                                                                }
+                                                            </ul>:''}
+                                                        </h3>
+                                                        <p className="food_description_content">{foods.description}</p>
+                                                        <p className="food_description_sale_rating">
+                                                            <span>月售{foods.month_sales}份</span>
+                                                            <span>好评率{foods.satisfy_rate}%</span>
+                                                        </p>
+                                                        {foods.activity?<p className="food_activity">
+                                                        <span style={{color:`#${foods.activity.image_text_color}`,borderColor:`#${foods.activity.icon_color}`}}>
+                                                            {foods.activity.image_text}
+                                                        </span>
+                                                        </p>:''}
+                                                    </section>
+                                                    </div>
+                                                    <footer className="menu_detail_footer">
+                                                        <section className="food_price">
+                                                            <span>¥</span>
+                                                            <span>{foods.specfoods[0].price}</span>
+                                                            {foods.specifications.length?<span>起</span>:''}
+                                                        </section>
+                                                        {/* <buy-cart shopId={this.state.shopId} foods={foods} @moveInCart="listenInCart" @showChooseList="showChooseList" @showReduceTip="showReduceTip" @showMoveDot="showMoveDotFun"></buy-cart> */}
+                                                    </footer>
+                                                </section> 
+                                            )
+                                        })
+                                    }
+                            </li>)})}
+                        </ul>
+                    </section>
+                </section>
+                <section className="buy_cart_container">
+                        <section oncClick={toggleCartList} className="cart_icon_num">
+                        <div className={`cart_icon_container ${this.state.totalPrice > 0?cart_icon_activity:''} ${this.state.receiveInCart?move_in_cart:''}`} class="cart_icon_container" ref="cartContainer">
+                            <span v-if="totalNum" className="cart_list_length">
+                                {totalNum}
+                            </span>
+                            {/* <svg class="cart_icon">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-icon"></use>
+                            </svg> */}
+                        </div>
+                        <div className="cart_num">
+                            <div>¥ {totalPrice}</div>
+                            <div>配送费¥{deliveryFee}</div>
+                        </div>
+                    </section>
+                    <section className={`gotopay ${this.state.minimumOrderAmount <= 0?'gotopay_acitvity':''}`} >
+                        {this.state.minimumOrderAmount?<span className="gotopay_button_style" >还差¥{minimumOrderAmount}起送</span>:''}
+                        {/* <router-link :to="{path:'/confirmOrder', query:{geohash, shopId}}" class="gotopay_button_style" v-else >去结算</router-link> */}
+                    </section>
+                </section>
             </section>
           </transition >
          
     {/* <section v-show="changeShowType =='food'" class="food_container">
         <section class="menu_container">
-            <section class="menu_left" id="wrapper_menu" ref="wrapperMenu">
-                <ul>
-                    <li v-for="(item,index) in menuList" :key="index" class="menu_left_li" :class="{activity_menu: index == menuIndex}" @click="chooseMenu(index)">
-                        <img :src="getImgPath(item.icon_url)" v-if="item.icon_url">
-                        <span>{{item.name}}</span>
-                        <span class="category_num" v-if="categoryNum[index]&&item.type==1">{{categoryNum[index]}}</span>
-                    </li>
-                </ul>
-            </section>
-            <section class="menu_right" ref="menuFoodList">
-                <ul>
-                    <li v-for="(item,index) in menuList" :key="index">
-                        <header class="menu_detail_header">
-                            <section class="menu_detail_header_left">
-                                <strong class="menu_item_title">{{item.name}}</strong>
-                                <span class="menu_item_description">{{item.description}}</span>
-                            </section>
-                            <span class="menu_detail_header_right" @click="showTitleDetail(index)"></span>
-                            <p class="description_tip" v-if="index == TitleDetailIndex">
-                                <span>{{item.name}}</span>
-                                {{item.description}}
-                            </p>
-                        </header>
-                        <section v-for="(foods,foodindex) in item.foods" :key="foodindex" class="menu_detail_list">
-                            <router-link  :to="{path: 'shop/foodDetail', query:{image_path:foods.image_path, description: foods.description, month_sales: foods.month_sales, name: foods.name, rating: foods.rating, rating_count: foods.rating_count, satisfy_rate: foods.satisfy_rate, foods, shopId}}" tag="div" class="menu_detail_link">
-                                <section class="menu_food_img">
-                                    <img :src="imgBaseUrl + foods.image_path">
-                                </section>
-                                <section class="menu_food_description">
-                                    <h3 class="food_description_head">
-                                        <strong class="description_foodname">{{foods.name}}</strong>
-                                        <ul v-if="foods.attributes.length" class="attributes_ul">
-                                            <li v-if="attribute" v-for="(attribute, foodindex) in foods.attributes" :key="foodindex" :style="{color: '#' + attribute.icon_color,borderColor:'#' + attribute.icon_color}" :class="{attribute_new: attribute.icon_name == '新'}">
-                                                <p :style="{color: attribute.icon_name == '新'? '#fff' : '#' + attribute.icon_color}">{{attribute.icon_name == '新'? '新品':attribute.icon_name}}</p>
-                                            </li>
-                                        </ul>
-
-                                    </h3>
-                                    <p class="food_description_content">{{foods.description}}</p>
-                                    <p class="food_description_sale_rating">
-                                        <span>月售{{foods.month_sales}}份</span>
-                                        <span>好评率{{foods.satisfy_rate}}%</span>
-                                    </p>
-                                    <p v-if="foods.activity" class="food_activity">
-                                    <span :style="{color: '#' + foods.activity.image_text_color,borderColor:'#' +foods.activity.icon_color}">{{foods.activity.image_text}}</span>
-                                    </p>
-                                </section>
-                            </router-link>
-                            <footer class="menu_detail_footer">
-                                <section class="food_price">
-                                    <span>¥</span>
-                                    <span>{{foods.specfoods[0].price}}</span>
-                                    <span v-if="foods.specifications.length">起</span>
-                                </section>
-                                <buy-cart :shopId='shopId' :foods='foods' @moveInCart="listenInCart" @showChooseList="showChooseList" @showReduceTip="showReduceTip" @showMoveDot="showMoveDotFun"></buy-cart>
-                            </footer>
-                        </section>
-                    </li>
-                </ul>
-            </section>
         </section>
         <section class="buy_cart_container">
             <section @click="toggleCartList" class="cart_icon_num">
