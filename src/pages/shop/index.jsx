@@ -2,52 +2,51 @@
 import  React from 'react';
 import './index.css';
 import store from '../../redux/store';
-import {shopDetails,foodMenu,ratingScores,ratingTags} from '../../service'
-export default class About extends React.Component {
+import {ShoppingCartOutlined,PlusOutlined} from '@ant-design/icons';
+import {shopDetails,foodMenu,ratingScores,ratingTags} from '../../service';
+import Buycar from '../../components/buycar/index.jsx';
+export default class Shop extends React.Component {
   constructor(props){
     super(props);
-    console.log('store',store.getState());
-    
     this.state = {
-      geohash: '', //geohash位置信息
-                shopId: 3269, //商店id值,
-
-                // geohash:store.getState().city.geohash,
-                showLoading: true, //显示加载动画
-                changeShowType: 'food',//切换显示商品或者评价
-                shopDetailData: {}, //商铺详情
-                showActivities: false, //是否显示活动详情
-                menuList: [], //食品列表
-                menuIndex: 0, //已选菜单索引值，默认为0
-                menuIndexChange: true,//解决选中index时，scroll监听事件重复判断设置index的bug
-                shopListTop: [], //商品列表的高度集合
-                TitleDetailIndex: null, //点击展示列表头部详情
-                categoryNum: [], //商品类型右上角已加入购物车的数量
-                totalPrice: 0, //总共价格
-                cartFoodList: [], //购物车商品列表
-                showCartList: false,//显示购物车列表
-                receiveInCart: false, //购物车组件下落的圆点是否到达目标位置
-                ratingList: null, //评价列表
-                ratingOffset: 0, //评价获取数据offset值
-                ratingScoresData: null, //评价总体分数
-                ratingTagsList: null, //评价分类列表
-                ratingTageIndex: 0, //评价分类索引
-                preventRepeatRequest: false,// 防止多次触发数据请求
-                ratingTagName: '',//评论的类型
-                loadRatings: false, //加载更多评论是显示加载组件
-                foodScroll: null,  //食品列表scroll
-                showSpecs: false,//控制显示食品规格
-                specsIndex: 0, //当前选中的规格索引值
-                choosedFoods: null, //当前选中视频数据
-                showDeleteTip: false, //多规格商品点击减按钮，弹出提示框
-                showMoveDot: [], //控制下落的小圆点显示隐藏
-                windowHeight: null, //屏幕的高度
-                elLeft: 0, //当前点击加按钮在网页中的绝对top值
-                elBottom: 0, //当前点击加按钮在网页中的绝对left值
-                ratingScroll: null, //评论页Scroll
-                imgBaseUrl:'/img/',
-                latitude: 32.095092, 
-                longitude: 118.914433
+        geohash: '', //geohash位置信息
+        shopId: 3269, //商店id值,
+        // geohash:store.getState().city.geohash,
+        showLoading: true, //显示加载动画
+        changeShowType: 'food',//切换显示商品或者评价
+        shopDetailData: {}, //商铺详情
+        showActivities: false, //是否显示活动详情
+        menuList: [], //食品列表
+        menuIndex: 0, //已选菜单索引值，默认为0
+        menuIndexChange: true,//解决选中index时，scroll监听事件重复判断设置index的bug
+        shopListTop: [], //商品列表的高度集合
+        TitleDetailIndex: null, //点击展示列表头部详情
+        categoryNum: [], //商品类型右上角已加入购物车的数量
+        totalPrice: 0, //总共价格
+        cartFoodList: [], //购物车商品列表
+        showCartList: false,//显示购物车列表
+        receiveInCart: false, //购物车组件下落的圆点是否到达目标位置
+        ratingList: null, //评价列表
+        ratingOffset: 0, //评价获取数据offset值
+        ratingScoresData: null, //评价总体分数
+        ratingTagsList: null, //评价分类列表
+        ratingTageIndex: 0, //评价分类索引
+        preventRepeatRequest: false,// 防止多次触发数据请求
+        ratingTagName: '',//评论的类型
+        loadRatings: false, //加载更多评论是显示加载组件
+        foodScroll: null,  //食品列表scroll
+        showSpecs: false,//控制显示食品规格
+        specsIndex: 0, //当前选中的规格索引值
+        choosedFoods: null, //当前选中视频数据
+        showDeleteTip: false, //多规格商品点击减按钮，弹出提示框
+        showMoveDot: [], //控制下落的小圆点显示隐藏
+        windowHeight: null, //屏幕的高度
+        elLeft: 0, //当前点击加按钮在网页中的绝对top值
+        elBottom: 0, //当前点击加按钮在网页中的绝对left值
+        ratingScroll: null, //评论页Scroll
+        imgBaseUrl:'/img/',
+        latitude: 32.095092, 
+        longitude: 118.914433
     }
   }
   //name: "美食店111222", address: "广东省潮州市潮安区 ", id: 3269, latitude: 32.095092, longitude: 118.914433
@@ -80,10 +79,59 @@ export default class About extends React.Component {
   toggleCartList(){
 
   }
+  clearCart(){
+
+  }
+  removeOutCart(category_id, item_id, food_id, name, price,specs){
+
+  }
+  
+  // buycar中的方法
+  listenInCart(){
+
+  }
+  showChooseList(){
+
+  }
+  showReduceTip(){
+
+  }
+  showMoveDotFun(){
+
+  }
+  removeOutCart(){
+      
+  }
+  //购物车中总共商品的数量
+  get totalNum(){
+    let num = 0;
+    this.state.cartFoodList.forEach(item => {
+        num += item.num
+    })
+    return num
+   }
+   get deliveryFee(){
+        if (this.state.shopDetailData) {
+            return this.state.shopDetailData.float_delivery_fee;
+        }else{
+            return null;
+        }
+    }
+    //还差多少元起送，为负数时显示去结算按钮
+   get minimumOrderAmount() {
+        if (this.state.shopDetailData) {
+            return this.state.shopDetailData.float_minimum_order_amount - this.state.totalPrice;
+        }else{
+            return null;
+        }
+    }
   componentDidMount() {
     this.initData();
   }
   render() {
+    const totalNum =  this.totalNum;
+    const deliveryFee = this.deliveryFee;
+    const minimumOrderAmount = this.minimumOrderAmount;
     return (
       <div className="shop_container">
           <header className="shop_detail_header"  >
@@ -117,7 +165,6 @@ export default class About extends React.Component {
                                             {this.state.categoryNum[index]&&item.type===1?<span className="category_num" >{this.state.categoryNum[index]}</span>:''}
                                         </li>
                                     )
-
                                 })
                                 }
                         </ul>
@@ -180,7 +227,7 @@ export default class About extends React.Component {
                                                             <span>{foods.specfoods[0].price}</span>
                                                             {foods.specifications.length?<span>起</span>:''}
                                                         </section>
-                                                        {/* <buy-cart shopId={this.state.shopId} foods={foods} @moveInCart="listenInCart" @showChooseList="showChooseList" @showReduceTip="showReduceTip" @showMoveDot="showMoveDotFun"></buy-cart> */}
+                                                        <Buycar shopId={this.state.shopId} foods={foods} moveInCart={this.listenInCart} showChooseList={this.showChooseList} showReduceTip={this.showReduceTip} showMoveDot={this.showMoveDotFun}> </Buycar>
                                                     </footer>
                                                 </section> 
                                             )
@@ -191,17 +238,15 @@ export default class About extends React.Component {
                     </section>
                 </section>
                 <section className="buy_cart_container">
-                        <section oncClick={toggleCartList} className="cart_icon_num">
-                        <div className={`cart_icon_container ${this.state.totalPrice > 0?cart_icon_activity:''} ${this.state.receiveInCart?move_in_cart:''}`} class="cart_icon_container" ref="cartContainer">
+                        <section oncClick={this.toggleCartList} className="cart_icon_num">
+                        <div className={`cart_icon_container ${this.state.totalPrice > 0?'cart_icon_activity':''} ${this.state.receiveInCart?'move_in_cart':''}`} class="cart_icon_container" ref="cartContainer">
                             <span v-if="totalNum" className="cart_list_length">
                                 {totalNum}
                             </span>
-                            {/* <svg class="cart_icon">
-                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-icon"></use>
-                            </svg> */}
+                            <ShoppingCartOutlined /> 
                         </div>
                         <div className="cart_num">
-                            <div>¥ {totalPrice}</div>
+                            <div>¥ {this.state.totalPrice}</div>
                             <div>配送费¥{deliveryFee}</div>
                         </div>
                     </section>
@@ -210,75 +255,58 @@ export default class About extends React.Component {
                         {/* <router-link :to="{path:'/confirmOrder', query:{geohash, shopId}}" class="gotopay_button_style" v-else >去结算</router-link> */}
                     </section>
                 </section>
+                <transition className="toggle-cart">
+                   { this.state.showCartList&&this.state.cartFoodList.length?
+                   <section className="cart_food_list" >
+                        <header>
+                            <h4>购物车</h4>
+                            <div onClick={this.clearCart}>
+                                {/* <svg>
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-remove"></use>
+                                </svg> */}
+                                <span className="clear_cart">清空</span>
+                            </div>
+                        </header>
+                        <section className="cart_food_details" id="cartFood">
+                            <ul>
+                                { 
+                                this.state.cartFoodList((item,index)=>{
+                                    return (
+                                        <li key={index} className="cart_food_li">
+                                            <div className="cart_list_num">
+                                                <p className="ellipsis">{item.name}</p>
+                                                <p className="ellipsis">{item.specs}</p>
+                                            </div>
+                                            <div className="cart_list_price">
+                                                <span>¥</span>
+                                                <span>{item.price}</span>
+                                            </div>
+                                            <section className="cart_list_control">
+                                                <span onClick={this.removeOutCart.bind(this,item.category_id, item.item_id, item.food_id, item.name, item.price,item.specs)}>
+                                                    {/* <svg>
+                                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
+                                                    </svg> */}
+                                                </span>
+                                                <span className="cart_num">{item.num}</span>
+                                                <PlusOutlined />
+                                                {/* <svg className="cart_add" @click="addToCart(item.category_id, item.item_id, item.food_id, item.name, item.price, item.specs)">
+                                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-add"></use>
+                                                </svg> */}
+                                            </section>
+                                        </li>
+                                    )
+                                })
+                                }
+                            </ul>
+                        </section>
+                    </section>:''}
+                </transition>
+                <transition className="fade">
+                    {this.state.showCartList&&this.state.cartFoodList.length?<div class="screen_cover"  onClick={this.toggleCartList}></div>:''}
+                </transition>
             </section>
           </transition >
-         
-    {/* <section v-show="changeShowType =='food'" class="food_container">
-        <section class="menu_container">
-        </section>
-        <section class="buy_cart_container">
-            <section @click="toggleCartList" class="cart_icon_num">
-                <div class="cart_icon_container" :class="{cart_icon_activity: totalPrice > 0, move_in_cart:receiveInCart}" ref="cartContainer">
-                    <span v-if="totalNum" class="cart_list_length">
-                        {{totalNum}}
-                    </span>
-                    <svg class="cart_icon">
-                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-icon"></use>
-                    </svg>
-                </div>
-                <div class="cart_num">
-                    <div>¥ {{totalPrice}}</div>
-                    <div>配送费¥{{deliveryFee}}</div>
-                </div>
-            </section>
-            <section class="gotopay" :class="{gotopay_acitvity: minimumOrderAmount <= 0}">
-                <span class="gotopay_button_style" v-if="minimumOrderAmount > 0">还差¥{{minimumOrderAmount}}起送</span>
-                <router-link :to="{path:'/confirmOrder', query:{geohash, shopId}}" class="gotopay_button_style" v-else >去结算</router-link>
-            </section>
-        </section>
-        <transition name="toggle-cart">
-            <section class="cart_food_list" v-show="showCartList&&cartFoodList.length">
-                <header>
-                    <h4>购物车</h4>
-                    <div @click="clearCart">
-                        <svg>
-                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-remove"></use>
-                        </svg>
-                        <span class="clear_cart">清空</span>
-                    </div>
-                </header>
-                <section class="cart_food_details" id="cartFood">
-                    <ul>
-                        <li v-for="(item, index) in cartFoodList" :key="index" class="cart_food_li">
-                            <div class="cart_list_num">
-                                <p class="ellipsis">{{item.name}}</p>
-                                <p class="ellipsis">{{item.specs}}</p>
-                            </div>
-                            <div class="cart_list_price">
-                                <span>¥</span>
-                                <span>{{item.price}}</span>
-                            </div>
-                            <section class="cart_list_control">
-                                <span @click="removeOutCart(item.category_id, item.item_id, item.food_id, item.name, item.price, item.specs)">
-                                    <svg>
-                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
-                                    </svg>
-                                </span>
-                                <span class="cart_num">{{item.num}}</span>
-                                <svg class="cart_add" @click="addToCart(item.category_id, item.item_id, item.food_id, item.name, item.price, item.specs)">
-                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-add"></use>
-                                </svg>
-                            </section>
-                        </li>
-                    </ul>
-                </section>
-            </section>
-        </transition>
-        <transition name="fade">
-            <div class="screen_cover" v-show="showCartList&&cartFoodList.length" @click="toggleCartList"></div>
-        </transition>
-    </section>
-</transition> */}
+    
       </div>
     )
   }
