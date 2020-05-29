@@ -18,4 +18,10 @@ const change_shopMsg = (value)=>{
         value:value
     }
 }
-module.exports = {change_city,change_place,change_shopMsg}
+const add_cart = (value)=>{
+    return {
+        type:'add_cart',
+        value:value
+    }
+}
+module.exports = {change_city,change_place,change_shopMsg,add_cart}

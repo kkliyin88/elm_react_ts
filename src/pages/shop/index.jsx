@@ -2,7 +2,8 @@
 import  React from 'react';
 import './index.css';
 import store from '../../redux/store';
-import {ShoppingCartOutlined,PlusOutlined} from '@ant-design/icons';
+import {add_cart} from '../../redux/action';
+import {ShoppingCartOutlined,PlusOutlined,MinusCircleOutlined} from '@ant-design/icons';
 import {shopDetails,foodMenu,ratingScores,ratingTags} from '../../service';
 import Buycar from '../../components/buycar/index.jsx';
 import { getImgPath} from '../../components/mixin.js'
@@ -97,12 +98,22 @@ export default class Shop extends React.Component {
   showReduceTip(){
 
   }
+
   showMoveDotFun(){
 
   }
   removeOutCart(){
 
   }
+   //加入购物车，所需7个参数，商铺id，食品分类id，食品id，食品规格id，食品名字，食品价格，食品规格
+   addToCart(category_id, item_id, food_id, name, price, specs){
+    //this.ADD_CART({shopid: this.shopId, category_id, item_id, food_id, name, price, specs});
+  }
+  
+  //移出购物车，所需7个参数，商铺id，食品分类id，食品id，食品规格id，食品名字，食品价格，食品规格
+  removeOutCart(category_id, item_id, food_id, name, price, specs){
+   // this.REDUCE_CART({shopid: this.shopId, category_id, item_id, food_id, name, price, specs});
+   }
   //购物车中总共商品的数量
   get totalNum(){
     let num = 0;
@@ -284,12 +295,16 @@ export default class Shop extends React.Component {
                                             </div>
                                             <section className="cart_list_control">
                                                 <span onClick={this.removeOutCart.bind(this,item.category_id, item.item_id, item.food_id, item.name, item.price,item.specs)}>
+                                                sm<MinusCircleOutlined />
                                                     {/* <svg>
                                                         <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
                                                     </svg> */}
                                                 </span>
                                                 <span className="cart_num">{item.num}</span>
-                                                <PlusOutlined />
+                                                <span className="cart_add" onClick={this.addToCart.bind(this,item.category_id, item.item_id, item.food_id, item.name, item.price, item.specs)}>
+                                                   ss <PlusOutlined />
+                                                </span>
+                                                
                                                 {/* <svg className="cart_add" @click="addToCart(item.category_id, item.item_id, item.food_id, item.name, item.price, item.specs)">
                                                     <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-add"></use>
                                                 </svg> */}
