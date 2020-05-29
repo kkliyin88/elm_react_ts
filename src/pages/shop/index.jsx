@@ -5,6 +5,7 @@ import store from '../../redux/store';
 import {ShoppingCartOutlined,PlusOutlined} from '@ant-design/icons';
 import {shopDetails,foodMenu,ratingScores,ratingTags} from '../../service';
 import Buycar from '../../components/buycar/index.jsx';
+import { getImgPath} from '../../components/mixin.js'
 export default class Shop extends React.Component {
   constructor(props){
     super(props);
@@ -100,7 +101,7 @@ export default class Shop extends React.Component {
 
   }
   removeOutCart(){
-      
+
   }
   //购物车中总共商品的数量
   get totalNum(){
@@ -160,7 +161,7 @@ export default class Shop extends React.Component {
                                 this.state.menuList.map((item,index)=>{
                                     return (
                                         <li  key={index} className={`menu_left_li ${index === this.state.menuIndex ?'activity_menu' :'' }`}  onClick={this.chooseMenu.bind(this,index)}>
-                                            {item.icon_url?<img src="getImgPath(item.icon_url)" v-if="item.icon_url" />:''}
+                                            {item.icon_url?<img src={getImgPath.bind(this,item.icon_url)}  />:''}
                                             <span>{item.name}</span>
                                             {this.state.categoryNum[index]&&item.type===1?<span className="category_num" >{this.state.categoryNum[index]}</span>:''}
                                         </li>

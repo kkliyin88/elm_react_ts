@@ -1,6 +1,7 @@
 //about.js
 import  React from 'react';
 import './index.css';
+import {MinusCircleOutlined,PlusCircleOutlined} from '@ant-design/icons';
 export default class Buycar extends React.Component {
   constructor(props){
     super(props);
@@ -36,23 +37,27 @@ export default class Buycar extends React.Component {
       // this.props.foods.specifications.length?
       {this.props.foods.specifications.length?<section className="cart_button">
           <transition name="showReduce">
-              { foodNum?<span  onClick={this.removeOutCart(this.props.foods.category_id, this.props.foods.item_id, this.props.foods.specfoods[0].food_id, this.props.foods.specfoods[0].name, this.props.foods.specfoods[0].price, '', this.props.foods.specfoods[0].packing_fee, this.props.foods.specfoods[0].sku_id, this.props.foods.specfoods[0].stock)} >
-                  {/* <svg>
-                      <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
-                  </svg> */}
+              { foodNum?<span  >
+                {/* onClick={this.props.removeOutCart(this.props.foods.category_id, this.props.foods.item_id, this.props.foods.specfoods[0].food_id, this.props.foods.specfoods[0].name, this.props.foods.specfoods[0].price, '', this.props.foods.specfoods[0].packing_fee, this.props.foods.specfoods[0].sku_id, this.props.foods.specfoods[0].stock)} */}
+                <MinusCircleOutlined />
               </span>:''}
           </transition>
           <transition name="fade">
              { foodNum?<span className="cart_num" >{foodNum}</span>:''}
           </transition>
-          {/* <svg className="add_icon" @click="addToCart(foods.category_id, foods.item_id, foods.specfoods[0].food_id, foods.specfoods[0].name, foods.specfoods[0].price, '', foods.specfoods[0].packing_fee, foods.specfoods[0].sku_id, foods.specfoods[0].stock, $event)">
-              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-add"></use>
-          </svg> */}
+          <span className="add_icon" >
+          {/* onClick={this.props.addToCart(this.props.category_id, this.props.item_id, this.props.specfoods[0].food_id, this.props.specfoods[0].name, this.props.specfoods[0].price, '', this.props.specfoods[0].packing_fee, this.props.specfoods[0].sku_id, this.props.specfoods[0].stock, 'event')} */}
+             <PlusCircleOutlined />
+          </span>
       </section>:
       <section  className="choose_specification">
           <section className="choose_icon_container">
               <transition name="showReduce">
-                  {/* <svg className="specs_reduce_icon" v-if="foodNum" @click="showReduceTip">
+                {foodNum?<span className="specs_reduce_icon" onClick={this.props.showReduceTip}>
+                   <MinusCircleOutlined />
+                </span>:''}
+               
+                  {/* <svg className="specs_reduce_icon" v-if="foodNum" >
                       <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
                   </svg> */}
               </transition>
