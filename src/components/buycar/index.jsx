@@ -2,7 +2,7 @@
 import  React from 'react';
 import './index.css';
 import store from '../../redux/store';
-import {add_cart} from '../../redux/action';
+import {add_cart,reduce_car} from '../../redux/action';
 import {MinusCircleOutlined,PlusCircleOutlined} from '@ant-design/icons';
 export default class Buycar extends React.Component {
   constructor(props){
@@ -16,7 +16,7 @@ export default class Buycar extends React.Component {
   }
   //加入购物车，计算按钮位置。
   addToCart(category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock, event){
-    let action = add_cart(this.props.shopId, category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock);
+    let action = add_cart({shopid: this.props.shopId, category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock});
     store.dispatch(action);
     //this.ADD_CART({shopid: this.shopId, category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock});
     // let elLeft = event.target.getBoundingClientRect().left;
@@ -25,9 +25,10 @@ export default class Buycar extends React.Component {
     // this.$emit('showMoveDot', this.showMoveDot, elLeft, elBottom);
    }
   removeOutCart(category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock){
-    // if (this.foodNum > 0) {
-    //     this.REDUCE_CART({shopid: this.shopId, category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock});
-    // }
+    let action =  reduce_car({shopid: this.props.shopId, category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock})
+    if (this.foodNum > 0) {
+      store.dispatch(action);
+     }
   }
   componentDidMount() {
    

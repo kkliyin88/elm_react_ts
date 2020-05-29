@@ -1,56 +1,139 @@
+
+/**
+ * 存储localStorage
+ */
+ const setStore = (name, content) => {
+	if (!name) return;
+	if (typeof content !== 'string') {
+		content = JSON.stringify(content);
+	}
+	window.localStorage.setItem(name, content);
+}
+/**
+ * 获取localStorage
+ */
+const getStore = name => {
+	if (!name) return;
+	return window.localStorage.getItem(name);
+}
+
+
+
+/**
+ * 删除localStorage
+ */
+const removeStore = name => {
+	if (!name) return;
+	window.localStorage.removeItem(name);
+}
+
 const initState ={
     city:{id:11,name:'深圳'},//所在城市
     place:{},//城市所选的具体位置,
     shopMsg:{}, //保存门店信息
     cartList:{}//加入购物车的商品列表
 }
-function add_card(state,value){
-        console.log('shopid_func',value.shopid)
-        let cart = state.cartList;
-		let shop = cart[value.shopid] = (cart[value.shopid] || {});
-		let category = shop[value.category_id] = (shop[value.category_id] || {});
-		let item = category[value.item_id] = (category[value.item_id] || {});
-		if (item[value.food_id]) {
-			item[value.food_id]['num']++;
+//清空当前商品的购物车信息
+function clear_cart(state, shopid) {
+    let cartList = Object.assign({}, state.cartList) 
+    cartList[shopid] = null;
+    setStore('buyCart', state.cartList);
+    return cartList
+}
+function add_cart(state,{
+    shopid,
+    category_id,
+    item_id,
+    food_id,
+    name,
+    price,
+    specs,
+    packing_fee,
+    sku_id,
+    stock
+}){
+        let cart = Object.assign({}, state.cartList);
+		let shop = cart[shopid] = (cart[shopid] || {});
+		let category = shop[category_id] = (shop[category_id] || {});
+		let item = category[item_id] = (category[item_id] || {});
+		if (item[food_id]) {
+			item[food_id]['num']++;
 		} else {
-			item[value.food_id] = {
+			item[food_id] = {
 					"num" : 1,
-					"id" : value.food_id,
-					"name" : value.name,
-					"price" : value.price,
-					"specs" : value.specs,
-					"packing_fee" : value.packing_fee,
-					"sku_id" : value.sku_id,
-					"stock" : value.stock
+					"id" : food_id,
+					"name" : name,
+					"price" : price,
+					"specs" : specs,
+					"packing_fee" : packing_fee,
+					"sku_id" : sku_id,
+					"stock" : stock
 			};
         }
-        console.log('cart-',cart)
+        //存入localStorage
+		 setStore('buyCart', state.cartList);
 		return cart
 }
+function reduce_cart(state, {
+    shopid,
+    category_id,
+    item_id,
+    food_id,
+    name,
+    price,
+    specs,
+}) {
+    let cart = Object.assign({}, state.cartList);
+    let shop = (cart[shopid] || {});
+    let category = (shop[category_id] || {});
+    let item = (category[item_id] || {});
+    if (item && item[food_id]) {
+        if (item[food_id]['num'] > 0) {
+            item[food_id]['num']--;
+            //存入localStorage
+            setStore('buyCart', state.cartList);
+        } else {
+            //商品数量为0，则清空当前商品的信息
+            item[food_id] = null;
+        }
+    }
+    return cart
+}
+
 const reducer = (state=initState,action)=>{
-    console.log('触发了reducer',action)
+    console.log('reducer_state',state)
     switch(action.type){ 
         case 'change_city':
-            return {
+            return Object.assign({}, state, {
                 city:action.value
-            };
+              })
             break;
         case 'change_place':
-            return {
+            return Object.assign({}, state, {
                 place:action.value
-            };
+              })
             break; 
         case 'change_shopMsg':
-            return {
+            return Object.assign({}, state, {
                 shopMsg:action.value
-            };
+              })
             break; 
         case 'add_cart':
-           let cart= add_card(state,action.value)
-            return {
-                cartList:cart
-            };
-            break;              
+            return Object.assign({}, state, {
+                cartList: add_cart(state,action.value)
+              })
+            break; 
+        case 'reduce_cart':
+            return  Object.assign({}, state, {
+                cartList: reduce_cart(state,action.value)
+              });
+          
+            break;
+        case 'clear_cart':
+            return  Object.assign({}, state, {
+                cartList: clear_cart(state,action.value)
+              });
+            break;                         
         default:
             return state
     }

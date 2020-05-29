@@ -2,7 +2,7 @@
 import  React from 'react';
 import './index.css';
 import store from '../../redux/store';
-import {add_cart} from '../../redux/action';
+import {add_cart,reduce_car,clear_cart} from '../../redux/action';
 import {ShoppingCartOutlined,PlusOutlined,MinusCircleOutlined} from '@ant-design/icons';
 import {shopDetails,foodMenu,ratingScores,ratingTags} from '../../service';
 import Buycar from '../../components/buycar/index.jsx';
@@ -76,13 +76,28 @@ export default class Shop extends React.Component {
     // })
   }
   showTitleDetail(index){
-
-  }
+    if (this.state.TitleDetailIndex == index) {
+        this.setState({
+            TitleDetailIndex:null
+        })
+       
+    }else{
+        this.setState({
+            TitleDetailIndex:index
+        })
+    }
+}
+  
+  //控制购物列表是否显示
   toggleCartList(){
-
-  }
+      this.setState({
+        showCartList:this.state.cartFoodList.length ?!this.state.showCartList:true
+      })
+ }
+  //清除购物车
   clearCart(){
-
+    this.toggleCartList();
+    // this.CLEAR_CART(this.shopId);
   }
   removeOutCart(category_id, item_id, food_id, name, price,specs){
 
@@ -95,25 +110,70 @@ export default class Shop extends React.Component {
   showChooseList(){
 
   }
+  //显示提示，无法减去商品
   showReduceTip(){
-
+    this.showDeleteTip = true;
+    this.setState({
+        showDeleteTip:true
+    })
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => {
+        clearTimeout(this.timer);
+        this.setState({
+            showDeleteTip:false
+        })
+    }, 3000);
   }
 
   showMoveDotFun(){
 
   }
-  removeOutCart(){
-
-  }
+    //隐藏动画
+    hideLoading(){
+        this.setState({
+            showLoading:false 
+        })
+    }
+    //显示规格列表
+    showChooseList(foods){
+        if (foods) {
+            this.setState({
+                showSpecs:!this.sate.showSpecs,
+                specsIndex:0,
+                choosedFoods:foods
+            })
+        }else{
+            this.setState({
+                showSpecs:!this.sate.showSpecs,
+                specsIndex:0
+            })
+        }
+    }
+    //记录当前所选规格的索引值
+    chooseSpecs(index){
+     this.setState({
+        specsIndex:index
+     })
+    
+    }
+    //多规格商品加入购物车
+    addSpecs(category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock){
+        let action = add_cart({shopid: this.sate.shopId, category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock});
+        store.dispatch(action);
+        this.showChooseList();
+    }
    //加入购物车，所需7个参数，商铺id，食品分类id，食品id，食品规格id，食品名字，食品价格，食品规格
    addToCart(category_id, item_id, food_id, name, price, specs){
+    let action = add_cart({shopid: this.sate.shopId, category_id, item_id, food_id, name, price, specs});
+    store.dispatch(action);
     //this.ADD_CART({shopid: this.shopId, category_id, item_id, food_id, name, price, specs});
   }
   
   //移出购物车，所需7个参数，商铺id，食品分类id，食品id，食品规格id，食品名字，食品价格，食品规格
   removeOutCart(category_id, item_id, food_id, name, price, specs){
-   // this.REDUCE_CART({shopid: this.shopId, category_id, item_id, food_id, name, price, specs});
-   }
+    let action =  reduce_car({shopid: this.props.shopId, category_id, item_id, food_id, name, price, specs})
+    store.dispatch(action);
+}
   //购物车中总共商品的数量
   get totalNum(){
     let num = 0;
@@ -263,7 +323,8 @@ export default class Shop extends React.Component {
                         </div>
                     </section>
                     <section className={`gotopay ${this.state.minimumOrderAmount <= 0?'gotopay_acitvity':''}`} >
-                        {this.state.minimumOrderAmount?<span className="gotopay_button_style" >还差¥{minimumOrderAmount}起送</span>:''}
+                        {minimumOrderAmount?<span className="gotopay_button_style" >还差¥{minimumOrderAmount}起送</span>
+                        :<sapn className="gotopay_button_style">去结算</sapn>}
                         {/* <router-link :to="{path:'/confirmOrder', query:{geohash, shopId}}" class="gotopay_button_style" v-else >去结算</router-link> */}
                     </section>
                 </section>
