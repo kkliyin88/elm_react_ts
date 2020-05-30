@@ -53,10 +53,8 @@ export default class Buycar extends React.Component {
   render() {
     const foodNum =this.foodNum;
     const foods = this.props.foods
-    console.log('foods_cart',foods);
     return (
       <section className="cart_module">
-      
       // this.props.foods.specifications.length?
       {this.props.foods.specifications.length?<section className="cart_button">
           <transition name="showReduce">

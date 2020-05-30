@@ -13,6 +13,7 @@ export default class Shop extends React.Component {
     this.state = {
         geohash: '', //geohash位置信息
         shopId: 3269, //商店id值,
+        test:'',
         // geohash:store.getState().city.geohash,
         showLoading: true, //显示加载动画
         changeShowType: 'food',//切换显示商品或者评价
@@ -97,12 +98,55 @@ export default class Shop extends React.Component {
   //清除购物车
   clearCart(){
     this.toggleCartList();
-    // this.CLEAR_CART(this.shopId);
+    let action= clear_cart(this.state.shopId)
+    store.dispatch(action);
   }
-  removeOutCart(category_id, item_id, food_id, name, price,specs){
-
-  }
-  
+  initCategoryNum(){
+    let newArr = [];
+    let cartFoodNum = 0;
+    this.setState({
+        totalPrice:0,
+        cartFoodList:[]
+    })
+    this.menuList.forEach((item, index) => {
+        if (this.shopCart&&this.shopCart[item.foods[0].category_id]) {
+            let num = 0;
+            Object.keys(this.shopCart[item.foods[0].category_id]).forEach(itemid => {
+                Object.keys(this.shopCart[item.foods[0].category_id][itemid]).forEach(foodid => {
+                    let foodItem = this.shopCart[item.foods[0].category_id][itemid][foodid];
+                    num += foodItem.num;
+                    if (item.type == 1) {
+                        this.setState({
+                            totalPrice:this.state.totalPrice + foodItem.num*foodItem.price
+                        })
+                        if (foodItem.num > 0) {
+                            let cartFoodList = Object.assign({},this.state.cartFoodList);
+                            cartFoodList[cartFoodNum] = {};
+                            cartFoodList[cartFoodNum].category_id = item.foods[0].category_id;
+                            cartFoodList[cartFoodNum].item_id = itemid;
+                            cartFoodList[cartFoodNum].food_id = foodid;
+                            cartFoodList[cartFoodNum].num = foodItem.num;
+                            cartFoodList[cartFoodNum].price = foodItem.price;
+                            cartFoodList[cartFoodNum].name = foodItem.name;
+                            cartFoodList[cartFoodNum].specs = foodItem.specs;
+                            cartFoodNum ++;
+                            this.setState({
+                                cartFoodList
+                            })
+                        }
+                    }
+                })
+            })
+            newArr[index] = num;
+        }else{
+            newArr[index] = 0;
+        }
+    })
+    this.setState({
+        totalPrice:this.state.totalPrice.toFixed(2),
+        categoryNum:[...newArr]
+    })
+}
   // buycar中的方法
   listenInCart(){
 
@@ -154,7 +198,6 @@ export default class Shop extends React.Component {
      this.setState({
         specsIndex:index
      })
-    
     }
     //多规格商品加入购物车
     addSpecs(category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock){
@@ -166,14 +209,14 @@ export default class Shop extends React.Component {
    addToCart(category_id, item_id, food_id, name, price, specs){
     let action = add_cart({shopid: this.sate.shopId, category_id, item_id, food_id, name, price, specs});
     store.dispatch(action);
-    //this.ADD_CART({shopid: this.shopId, category_id, item_id, food_id, name, price, specs});
+    console.log('shopCart_add',store.getState().carList);
   }
   
   //移出购物车，所需7个参数，商铺id，食品分类id，食品id，食品规格id，食品名字，食品价格，食品规格
   removeOutCart(category_id, item_id, food_id, name, price, specs){
     let action =  reduce_car({shopid: this.props.shopId, category_id, item_id, food_id, name, price, specs})
     store.dispatch(action);
-}
+  }
   //购物车中总共商品的数量
   get totalNum(){
     let num = 0;
@@ -182,6 +225,12 @@ export default class Shop extends React.Component {
     })
     return num
    }
+   get shopCart(){
+       let carList = store.getState().carList;
+       if(carList&&carList[this.state.shopId]){
+        return {...carList[this.state.shopId]}; 
+       }
+    }
    get deliveryFee(){
         if (this.state.shopDetailData) {
             return this.state.shopDetailData.float_delivery_fee;
@@ -199,16 +248,22 @@ export default class Shop extends React.Component {
     }
   componentDidMount() {
     this.initData();
+    this.setState({
+        test:store.getState().test
+    })
   }
   render() {
     const totalNum =  this.totalNum;
     const deliveryFee = this.deliveryFee;
     const minimumOrderAmount = this.minimumOrderAmount;
+    const shopCart = this.shopCart;
+    console.log('shopCart1',this.state.test)
     return (
       <div className="shop_container">
           <header className="shop_detail_header"  >
             <div className="header_cover_img_con">
              <img src={`${this.state.imgBaseUrl}${this.state.shopDetailData.image_path}`} className="header_cover_img" /> 
+            <sapn>{this.state.test}</sapn>
             </div>
             <section className="description_header">
                 <div className="description_top">
@@ -312,7 +367,7 @@ export default class Shop extends React.Component {
                 <section className="buy_cart_container">
                         <section oncClick={this.toggleCartList} className="cart_icon_num">
                         <div className={`cart_icon_container ${this.state.totalPrice > 0?'cart_icon_activity':''} ${this.state.receiveInCart?'move_in_cart':''}`} class="cart_icon_container" ref="cartContainer">
-                            <span v-if="totalNum" className="cart_list_length">
+                            <span className="cart_list_length">
                                 {totalNum}
                             </span>
                             <ShoppingCartOutlined /> 
@@ -328,7 +383,7 @@ export default class Shop extends React.Component {
                         {/* <router-link :to="{path:'/confirmOrder', query:{geohash, shopId}}" class="gotopay_button_style" v-else >去结算</router-link> */}
                     </section>
                 </section>
-                <transition className="toggle-cart">
+                <transition className="toggle-cart" name='aa'>
                    { this.state.showCartList&&this.state.cartFoodList.length?
                    <section className="cart_food_list" >
                         <header>

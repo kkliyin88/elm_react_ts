@@ -31,7 +31,8 @@ const initState ={
     city:{id:11,name:'深圳'},//所在城市
     place:{},//城市所选的具体位置,
     shopMsg:{}, //保存门店信息
-    cartList:{}//加入购物车的商品列表
+    cartList:{},//加入购物车的商品列表
+    test:123
 }
 //清空当前商品的购物车信息
 function clear_cart(state, shopid) {
@@ -119,8 +120,10 @@ const reducer = (state=initState,action)=>{
               })
             break; 
         case 'add_cart':
+            console.log('state_reducer',state)
             return Object.assign({}, state, {
-                cartList: add_cart(state,action.value)
+                cartList: add_cart(state,action.value),
+                test:state.test+100
               })
             break; 
         case 'reduce_cart':
@@ -131,7 +134,8 @@ const reducer = (state=initState,action)=>{
             break;
         case 'clear_cart':
             return  Object.assign({}, state, {
-                cartList: clear_cart(state,action.value)
+                cartList: clear_cart(state,action.value),
+                
               });
             break;                         
         default:
