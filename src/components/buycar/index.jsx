@@ -9,6 +9,7 @@ export default class Buycar extends React.Component {
     super(props);
     this.state = {
       showMoveDot: [], //控制下落的小圆点显示隐藏
+      test:store.getState().test
     }
   }
   showChooseList(food){
@@ -30,8 +31,13 @@ export default class Buycar extends React.Component {
       store.dispatch(action);
      }
   }
+  getTestNum=()=>{
+    this.setState({
+      test:store.getState().test
+    })
+  }
   componentDidMount() {
-   
+    store.subscribe(this.getTestNum)
   }
   get foodNum(){
     let category_id = this.props.foods.category_id;
@@ -52,10 +58,8 @@ export default class Buycar extends React.Component {
   render() {
     const foodNum =this.foodNum;
     const foods = this.props.foods
-    
     return (
       <section className="cart_module">
-      // this.props.foods.specifications.length?
       {this.props.foods.specifications.length?<section className="cart_button">
           <div>
               <span  onClick={this.removeOutCart.bind(this,foods.category_id, foods.item_id, foods.specfoods[0].food_id, foods.specfoods[0].name, foods.specfoods[0].price, '', foods.specfoods[0].packing_fee, foods.specfoods[0].sku_id, foods.specfoods[0].stock)} >
@@ -68,7 +72,7 @@ export default class Buycar extends React.Component {
           </div>
           <span className="add_icon" onClick={this.addToCart.bind(this,foods.category_id, foods.item_id, foods.specfoods[0].food_id, foods.specfoods[0].name, foods.specfoods[0].price, '', foods.specfoods[0].packing_fee, foods.specfoods[0].sku_id, foods.specfoods[0].stock, 'event')}>
           {/* this.props.foods.category_id, this.props.foods.item_id, this.props.foods.specfoods[0].food_id, this.props.foods.specfoods[0].name, this.props.foods.specfoods[0].price, '', this.props.foods.specfoods[0].packing_fee, this.props.foods.specfoods[0].sku_id, this.props.specfoods[0].stock, 'event' */}
-             cs<PlusCircleOutlined />
+             <PlusCircleOutlined />
           </span>
       </section>:
       <section  className="choose_specification">
@@ -79,7 +83,7 @@ export default class Buycar extends React.Component {
                 </span>:''}
               </div>
               <div >
-                 {foodNum?<span className="cart_num" >{foodNum}</span>:''}
+               { foodNum?<span className="cart_num" >{ foodNum}</span>:''}
               </div>
               <span className="show_chooselist" onClick={this.showChooseList.bind(this,this.props.foods)} >选规格</span> 
               {/*  */}

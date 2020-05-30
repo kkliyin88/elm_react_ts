@@ -14,7 +14,8 @@ export default class Shop extends React.Component {
     this.state = {
         geohash: '', //geohash位置信息
         shopId: 3269, //商店id值,
-        test:'',
+        shopCart:{},
+        total:0, //在本店铺的购物车数量
         // geohash:store.getState().city.geohash,
         showLoading: true, //显示加载动画
         changeShowType: 'food',//切换显示商品或者评价
@@ -64,7 +65,6 @@ export default class Shop extends React.Component {
       ratingScoresData: await ratingScores(this.state.shopId),//商铺评论详情
       ratingTagsList : await ratingTags(this.state.shopId)//评论Tag列表
     })
-    console.log('shopDetailData',this.state.shopDetailData)
   }
   chooseMenu(index){
     this.setState({
@@ -102,19 +102,19 @@ export default class Shop extends React.Component {
     let action= clear_cart(this.state.shopId)
     store.dispatch(action);
   }
-  initCategoryNum(){
+  initCategoryNum=()=>{
     let newArr = [];
     let cartFoodNum = 0;
     this.setState({
         totalPrice:0,
         cartFoodList:[]
     })
-    this.menuList.forEach((item, index) => {
-        if (this.shopCart&&this.shopCart[item.foods[0].category_id]) {
+    this.state.menuList.forEach((item, index) => {
+        if (this.state.shopCart&&this.state.shopCart[item.foods[0].category_id]) {
             let num = 0;
-            Object.keys(this.shopCart[item.foods[0].category_id]).forEach(itemid => {
-                Object.keys(this.shopCart[item.foods[0].category_id][itemid]).forEach(foodid => {
-                    let foodItem = this.shopCart[item.foods[0].category_id][itemid][foodid];
+            Object.keys(this.state.shopCart[item.foods[0].category_id]).forEach(itemid => {
+                Object.keys(this.state.shopCart[item.foods[0].category_id][itemid]).forEach(foodid => {
+                    let foodItem = this.state.shopCart[item.foods[0].category_id][itemid][foodid];
                     num += foodItem.num;
                     if (item.type == 1) {
                         this.setState({
@@ -134,6 +134,7 @@ export default class Shop extends React.Component {
                             this.setState({
                                 cartFoodList
                             })
+
                         }
                     }
                 })
@@ -144,9 +145,11 @@ export default class Shop extends React.Component {
         }
     })
     this.setState({
-        totalPrice:this.state.totalPrice.toFixed(2),
+        // totalPrice:this.state.totalPrice.toFixed(2),
         categoryNum:[...newArr]
     })
+    console.log('cartFoodList',this.state.cartFoodList);
+    console.log('totalPrice',this.state.totalPrice);
 }
   // buycar中的方法
   listenInCart(){
@@ -178,8 +181,6 @@ export default class Shop extends React.Component {
     }
     //显示规格列表
     showChooseList(foods){
-        console.log('执行组件的方法',foods);
-       
         if (foods) {
             this.setState({
                 showSpecs:!this.state.showSpecs,
@@ -192,14 +193,11 @@ export default class Shop extends React.Component {
                 specsIndex:0
             })
         }
-        console.log('state',this.state);
     }
     //获取食品列表的高度，存入shopListTop
     async getFoodListHeight(){
         let menuFoodList_li = await document.getElementsByClassName('menuFoodList_li');
-        console.log('menuFoodList_li',menuFoodList_li)
         let  listArr = await Array.from(menuFoodList_li);
-        console.log('listArr',listArr)
     }
     //当滑动食品列表时，监听其scrollTop值来设置对应的食品列表标题的样式
     listenScroll(element){
@@ -245,7 +243,6 @@ export default class Shop extends React.Component {
    addToCart(category_id, item_id, food_id, name, price, specs){
     let action = add_cart({shopid: this.sate.shopId, category_id, item_id, food_id, name, price, specs});
     store.dispatch(action);
-    console.log('shopCart_add',store.getState().carList);
   }
   
   //移出购物车，所需7个参数，商铺id，食品分类id，食品id，食品规格id，食品名字，食品价格，食品规格
@@ -254,19 +251,25 @@ export default class Shop extends React.Component {
     store.dispatch(action);
   }
   //购物车中总共商品的数量
-  get totalNum(){
+  getTotalNum=()=>{
     let num = 0;
     this.state.cartFoodList.forEach(item => {
         num += item.num
     })
     return num
    }
-   get shopCart(){
-       let carList = store.getState().carList;
-       if(carList&&carList[this.state.shopId]){
-        return {...carList[this.state.shopId]}; 
+   getShopCart=()=>{
+       let cartList = store.getState().cartList;
+       let shopCart = {};
+       if(cartList&&cartList[this.state.shopId]){
+        shopCart = cartList[this.state.shopId]; 
        }
+       this.setState({
+            shopCart:shopCart
+       })
+       this.initCategoryNum();
     }
+
    get deliveryFee(){
         if (this.state.shopDetailData) {
             return this.state.shopDetailData.float_delivery_fee;
@@ -285,26 +288,19 @@ export default class Shop extends React.Component {
   componentDidMount() {
     this.initData();
     this.getFoodListHeight();
-    this.setState({
-        test:store.getState().test
-    })
-  }
-  componentDidUpdate(){
-      console.log('test',this.state.test)
+    store.subscribe(this.getTotalNum); //购物车数量
+    store.subscribe(this.getShopCart); // 购物车列表
+    
   }
   render() {
-    const totalNum =  this.totalNum;
     const deliveryFee = this.deliveryFee;
     const minimumOrderAmount = this.minimumOrderAmount;
-    const shopCart = this.shopCart;
-    console.log('shopCart1',this.state.test)
     return (
       <div>
         <section className="shop_container">
             <header className="shop_detail_header"  >
                 <div className="header_cover_img_con">
                 <img src={`${this.state.imgBaseUrl}${this.state.shopDetailData.image_path}`} className="header_cover_img" /> 
-                <span>{this.state.test}</span>
                 </div>
                 <section className="description_header">
                     <div className="description_top">
@@ -409,7 +405,7 @@ export default class Shop extends React.Component {
                             <section onClick={this.toggleCartList} className="cart_icon_num">
                             <div className={`cart_icon_container ${this.state.totalPrice > 0?'cart_icon_activity':''} ${this.state.receiveInCart?'move_in_cart':''}`}  ref="cartContainer">
                                 <span className="cart_list_length">
-                                    {totalNum}
+                                    {this.state.totalNum}
                                 </span>
                                 <ShoppingCartOutlined /> 
                             </div>
@@ -453,7 +449,6 @@ export default class Shop extends React.Component {
                                                 <section className="cart_list_control">
                                                     <span onClick={this.removeOutCart.bind(this,item.category_id, item.item_id, item.food_id, item.name, item.price,item.specs)}>
                                                     <MinusCircleOutlined />
-                                                    
                                                     </span>
                                                     <span className="cart_num">{item.num}</span>
                                                     <span className="cart_add" onClick={this.addToCart.bind(this,item.category_id, item.item_id, item.food_id, item.name, item.price, item.specs)}>
