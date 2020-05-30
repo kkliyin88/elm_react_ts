@@ -12,7 +12,7 @@ export default class Buycar extends React.Component {
     }
   }
   showChooseList(food){
-
+    this.props.showChooseList(food)
   }
   //加入购物车，计算按钮位置。
   addToCart(category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock, event){
@@ -47,25 +47,25 @@ export default class Buycar extends React.Component {
     }
   }
   get shopCart(){
-    return {}
-    // return Object.assign({},this.cartList[this.props.shopId]);
+    return Object.assign({},store.getState().cartList[this.props.shopId])
   }
   render() {
     const foodNum =this.foodNum;
     const foods = this.props.foods
+    
     return (
       <section className="cart_module">
       // this.props.foods.specifications.length?
       {this.props.foods.specifications.length?<section className="cart_button">
-          <transition name="showReduce">
-              { foodNum?<span  onClick={this.removeOutCart.bind(this,foods.category_id, foods.item_id, foods.specfoods[0].food_id, foods.specfoods[0].name, foods.specfoods[0].price, '', foods.specfoods[0].packing_fee, foods.specfoods[0].sku_id, foods.specfoods[0].stock)} >
+          <div>
+              <span  onClick={this.removeOutCart.bind(this,foods.category_id, foods.item_id, foods.specfoods[0].food_id, foods.specfoods[0].name, foods.specfoods[0].price, '', foods.specfoods[0].packing_fee, foods.specfoods[0].sku_id, foods.specfoods[0].stock)} >
                 {/* this.props.foods.category_id, this.props.foods.item_id, this.props.foods.specfoods[0].food_id, this.props.foods.specfoods[0].name, this.props.foods.specfoods[0].price, '', this.props.foods.specfoods[0].packing_fee, this.props.foods.specfoods[0].sku_id, this.props.foods.specfoods[0].stock */}
-                cm<MinusCircleOutlined />
-              </span>:''}
-          </transition>
-          <transition name="fade">
-             { foodNum?<span className="cart_num" >{foodNum}</span>:''}
-          </transition>
+                <MinusCircleOutlined />
+              </span>
+          </div>
+          <div >
+             <span className="cart_num" style={{margin:'0 5px'}}>{foodNum||0}</span>
+          </div>
           <span className="add_icon" onClick={this.addToCart.bind(this,foods.category_id, foods.item_id, foods.specfoods[0].food_id, foods.specfoods[0].name, foods.specfoods[0].price, '', foods.specfoods[0].packing_fee, foods.specfoods[0].sku_id, foods.specfoods[0].stock, 'event')}>
           {/* this.props.foods.category_id, this.props.foods.item_id, this.props.foods.specfoods[0].food_id, this.props.foods.specfoods[0].name, this.props.foods.specfoods[0].price, '', this.props.foods.specfoods[0].packing_fee, this.props.foods.specfoods[0].sku_id, this.props.specfoods[0].stock, 'event' */}
              cs<PlusCircleOutlined />
@@ -73,16 +73,16 @@ export default class Buycar extends React.Component {
       </section>:
       <section  className="choose_specification">
           <section className="choose_icon_container">
-              <transition name="showReduce">
+              <div name="showReduce">
                 {foodNum?<span className="specs_reduce_icon" onClick={this.props.showReduceTip}>
                    <MinusCircleOutlined />
                 </span>:''}
-              </transition>
-              <transition name="fade">
+              </div>
+              <div >
                  {foodNum?<span className="cart_num" >{foodNum}</span>:''}
-              </transition>
-              <span className="show_chooselist" >选规格</span> 
-              {/* onClick={this.showChooseList.bine(this,this.props.foods)} */}
+              </div>
+              <span className="show_chooselist" onClick={this.showChooseList.bind(this,this.props.foods)} >选规格</span> 
+              {/*  */}
           </section>
       </section>}
   </section>
