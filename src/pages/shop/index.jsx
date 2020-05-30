@@ -6,7 +6,8 @@ import {add_cart,reduce_car,clear_cart} from '../../redux/action';
 import {ShoppingCartOutlined,PlusOutlined,MinusCircleOutlined} from '@ant-design/icons';
 import {shopDetails,foodMenu,ratingScores,ratingTags} from '../../service';
 import Buycar from '../../components/buycar/index.jsx';
-import { getImgPath} from '../../components/mixin.js'
+import { getImgPath} from '../../components/mixin.js';
+import BScroll from 'better-scroll'
 export default class Shop extends React.Component {
   constructor(props){
     super(props);
@@ -193,6 +194,41 @@ export default class Shop extends React.Component {
         }
         console.log('state',this.state);
     }
+    //获取食品列表的高度，存入shopListTop
+    async getFoodListHeight(){
+        let menuFoodList_li = await document.getElementsByClassName('menuFoodList_li');
+        console.log('menuFoodList_li',menuFoodList_li)
+        let  listArr = await Array.from(menuFoodList_li);
+        console.log('listArr',listArr)
+    }
+    //当滑动食品列表时，监听其scrollTop值来设置对应的食品列表标题的样式
+    listenScroll(element){
+        this.foodScroll = new BScroll(element, {
+            probeType: 3,
+            deceleration: 0.001,
+            bounce: false,
+            swipeTime: 2000,
+            click: true,
+        });
+
+        const wrapperMenu = new BScroll('#wrapper_menu', {
+            click: true,
+        });
+        const wrapMenuHeight = this.$refs.wrapperMenu.clientHeight;
+        this.foodScroll.on('scroll', (pos) => {
+            if (!this.$refs.wrapperMenu) {
+                return
+            }
+            this.shopListTop.forEach((item, index) => {
+                if (this.menuIndexChange && Math.abs(Math.round(pos.y)) >= item) {
+                    this.menuIndex = index;
+                    const menuList=this.$refs.wrapperMenu.querySelectorAll('.activity_menu');
+                    const el = menuList[0];
+                    wrapperMenu.scrollToElement(el, 800, 0, -(wrapMenuHeight/2 - 50));
+                }
+            })
+        })
+    }
     //记录当前所选规格的索引值
     chooseSpecs(index){
      this.setState({
@@ -248,6 +284,7 @@ export default class Shop extends React.Component {
     }
   componentDidMount() {
     this.initData();
+    this.getFoodListHeight();
     this.setState({
         test:store.getState().test
     })
@@ -285,7 +322,7 @@ export default class Shop extends React.Component {
             <div >
                 <section  className="food_container">
                     <section className="menu_container">
-                        <section className="menu_left" id="wrapper_menu" ref="wrapperMenu1">
+                        <section className="menu_left" id="wrapper_menu" ref="wrapperMenu">
                             <ul>
                                 {
                                     this.state.menuList.map((item,index)=>{
@@ -303,7 +340,7 @@ export default class Shop extends React.Component {
                         <section className="menu_right" ref="menuFoodList">
                             <ul>
                                 { this.state.menuList.map((item,index)=>{
-                                    return (<li key={index}>
+                                    return (<li key={index} class='menuFoodList_li'>
                                         <header className="menu_detail_header">
                                             <section className="menu_detail_header_left">
                                                 <strong className="menu_item_title">{item.name}</strong>
@@ -470,7 +507,6 @@ export default class Shop extends React.Component {
         <section name="fade">
             {this.state.showDeleteTip?<p className="show_delete_tip" v-if="showDeleteTip">多规格商品只能去购物车删除哦</p>:''}
         </section>
-
       </div>
     )
   }
