@@ -102,26 +102,22 @@ export default class Shop extends React.Component {
     let action= clear_cart(this.state.shopId)
     store.dispatch(action);
   }
-  initCategoryNum=()=>{
+  initCategoryNum=()=>{  //标记每个类目的购买数量
     let newArr = [];
     let cartFoodNum = 0;
-    this.setState({
-        totalPrice:0,
-        cartFoodList:[]
-    })
+    let cartFoodList = []
     this.state.menuList.forEach((item, index) => {
         if (this.state.shopCart&&this.state.shopCart[item.foods[0].category_id]) {
             let num = 0;
             Object.keys(this.state.shopCart[item.foods[0].category_id]).forEach(itemid => {
                 Object.keys(this.state.shopCart[item.foods[0].category_id][itemid]).forEach(foodid => {
                     let foodItem = this.state.shopCart[item.foods[0].category_id][itemid][foodid];
-                    num += foodItem.num;
+                    num = num + foodItem.num;
                     if (item.type == 1) {
                         this.setState({
                             totalPrice:this.state.totalPrice + foodItem.num*foodItem.price
                         })
                         if (foodItem.num > 0) {
-                            let cartFoodList = Object.assign({},this.state.cartFoodList);
                             cartFoodList[cartFoodNum] = {};
                             cartFoodList[cartFoodNum].category_id = item.foods[0].category_id;
                             cartFoodList[cartFoodNum].item_id = itemid;
@@ -131,13 +127,13 @@ export default class Shop extends React.Component {
                             cartFoodList[cartFoodNum].name = foodItem.name;
                             cartFoodList[cartFoodNum].specs = foodItem.specs;
                             cartFoodNum ++;
-                            this.setState({
-                                cartFoodList
-                            })
-
                         }
                     }
                 })
+            });
+            console.log('cartFoodList_test',cartFoodList)
+            this.setState({
+                cartFoodList
             })
             newArr[index] = num;
         }else{
@@ -148,8 +144,6 @@ export default class Shop extends React.Component {
         // totalPrice:this.state.totalPrice.toFixed(2),
         categoryNum:[...newArr]
     })
-    console.log('cartFoodList',this.state.cartFoodList);
-    console.log('totalPrice',this.state.totalPrice);
 }
   // buycar中的方法
   listenInCart(){
@@ -252,11 +246,14 @@ export default class Shop extends React.Component {
   }
   //购物车中总共商品的数量
   getTotalNum=()=>{
-    let num = 0;
+    let num = 1;
     this.state.cartFoodList.forEach(item => {
         num += item.num
     })
-    return num
+    console.log('getTotalNum',this.state.cartFoodList)
+   this.setState({
+       totalNum:num
+   })
    }
    getShopCart=()=>{
        let cartList = store.getState().cartList;
@@ -336,7 +333,7 @@ export default class Shop extends React.Component {
                         <section className="menu_right" ref="menuFoodList">
                             <ul>
                                 { this.state.menuList.map((item,index)=>{
-                                    return (<li key={index} class='menuFoodList_li'>
+                                    return (<li key={index} className='menuFoodList_li'>
                                         <header className="menu_detail_header">
                                             <section className="menu_detail_header_left">
                                                 <strong className="menu_item_title">{item.name}</strong>
@@ -405,7 +402,7 @@ export default class Shop extends React.Component {
                             <section onClick={this.toggleCartList} className="cart_icon_num">
                             <div className={`cart_icon_container ${this.state.totalPrice > 0?'cart_icon_activity':''} ${this.state.receiveInCart?'move_in_cart':''}`}  ref="cartContainer">
                                 <span className="cart_list_length">
-                                    {this.state.totalNum}
+                                    {this.state.totalNum||0}
                                 </span>
                                 <ShoppingCartOutlined /> 
                             </div>

@@ -31,7 +31,7 @@ const initState ={
     city:{id:11,name:'深圳'},//所在城市
     place:{},//城市所选的具体位置,
     shopMsg:{}, //保存门店信息
-    cartList:{},//加入购物车的商品列表
+    cartList:[],//加入购物车的商品列表
     test:123
 }
 //清空当前商品的购物车信息
@@ -53,6 +53,7 @@ function add_cart(state,{
     sku_id,
     stock
 }){
+
         let cart = Object.assign({}, state.cartList);
 		let shop = cart[shopid] = (cart[shopid] || {});
 		let category = shop[category_id] = (shop[category_id] || {});
