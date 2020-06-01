@@ -11,6 +11,9 @@ import BScroll from 'better-scroll'
 export default class Shop extends React.Component {
   constructor(props){
     super(props);
+    this.menuFoodList = React.createRef();
+    this.wrapperMenu = React.createRef();
+    this.cartContainer =  React.createRef();
     this.state = {
         geohash: '', //geohash位置信息
         shopId: 3269, //商店id值,
@@ -72,10 +75,12 @@ export default class Shop extends React.Component {
         menuIndexChange: false
     })
     //menuIndexChange解决运动时listenScroll依然监听的bug
-    // this.foodScroll.scrollTo(0, -this.shopListTop[index], 400);
-    // this.foodScroll.on('scrollEnd', () => {
-    //     this.menuIndexChange = true;
-    // })
+    this.state.foodScroll.scrollTo(0, -this.shopListTop[index], 400);
+    this.state.foodScroll.on('scrollEnd', () => {
+        this.setState({
+            menuIndexChange:true
+        })
+    })
   }
   showTitleDetail(index){
     if (this.state.TitleDetailIndex == index) {
@@ -190,31 +195,42 @@ export default class Shop extends React.Component {
     }
     //获取食品列表的高度，存入shopListTop
     async getFoodListHeight(){
-        let menuFoodList_li = await document.getElementsByClassName('menuFoodList_li');
-        let  listArr = await Array.from(menuFoodList_li);
+        let menuFoodList_li = this.menuFoodList.current.children;
+        console.log('menuFoodList_li',menuFoodList_li);
+        console.log('menuFoodList_li_type',typeof menuFoodList_li)
+        // let  listArr = await Array.from(menuFoodList_li);
+        // console.log('listArr',listArr);
+        // for(let i=0;i<listArr.length;i++){
+        //     console.log('item',listArr[i]);
+        // }
+        
     }
     //当滑动食品列表时，监听其scrollTop值来设置对应的食品列表标题的样式
     listenScroll(element){
-        this.foodScroll = new BScroll(element, {
-            probeType: 3,
-            deceleration: 0.001,
-            bounce: false,
-            swipeTime: 2000,
-            click: true,
-        });
+        this.setState({
+            foodScroll:new BScroll(element, {
+                probeType: 3,
+                deceleration: 0.001,
+                bounce: false,
+                swipeTime: 2000,
+                click: true,
+            })
+        })
 
         const wrapperMenu = new BScroll('#wrapper_menu', {
             click: true,
         });
         const wrapMenuHeight = this.$refs.wrapperMenu.clientHeight;
         this.foodScroll.on('scroll', (pos) => {
-            if (!this.$refs.wrapperMenu) {
+            if (!this.wrapperMenu) {
                 return
             }
             this.shopListTop.forEach((item, index) => {
                 if (this.menuIndexChange && Math.abs(Math.round(pos.y)) >= item) {
-                    this.menuIndex = index;
-                    const menuList=this.$refs.wrapperMenu.querySelectorAll('.activity_menu');
+                    this.setState({
+                       menuIndex : index
+                    })
+                    const menuList=this.wrapperMenu.querySelectorAll('.activity_menu');
                     const el = menuList[0];
                     wrapperMenu.scrollToElement(el, 800, 0, -(wrapMenuHeight/2 - 50));
                 }
@@ -250,7 +266,6 @@ export default class Shop extends React.Component {
     this.state.cartFoodList.forEach(item => {
         num += item.num
     })
-    console.log('getTotalNum',this.state.cartFoodList)
    this.setState({
        totalNum:num
    })
@@ -284,7 +299,10 @@ export default class Shop extends React.Component {
     }
   componentDidMount() {
     this.initData();
-    this.getFoodListHeight();
+    setTimeout(()=>{
+        this.getFoodListHeight();
+    },100)
+    
     store.subscribe(this.getTotalNum); //购物车数量
     store.subscribe(this.getShopCart); // 购物车列表
     
@@ -315,7 +333,7 @@ export default class Shop extends React.Component {
             <div >
                 <section  className="food_container">
                     <section className="menu_container">
-                        <section className="menu_left" id="wrapper_menu" ref="wrapperMenu">
+                        <section className="menu_left" id="wrapper_menu" ref={this.wrapperMenu}>
                             <ul>
                                 {
                                     this.state.menuList.map((item,index)=>{
@@ -330,10 +348,10 @@ export default class Shop extends React.Component {
                                     }
                             </ul>
                         </section>
-                        <section className="menu_right" ref="menuFoodList">
-                            <ul>
+                        <section className="menu_right" >
+                            <ul ref={this.menuFoodList}>
                                 { this.state.menuList.map((item,index)=>{
-                                    return (<li key={index} className='menuFoodList_li'>
+                                    return (<li key={index} >
                                         <header className="menu_detail_header">
                                             <section className="menu_detail_header_left">
                                                 <strong className="menu_item_title">{item.name}</strong>
@@ -400,7 +418,7 @@ export default class Shop extends React.Component {
                     </section>
                     <section className="buy_cart_container">
                             <section onClick={this.toggleCartList} className="cart_icon_num">
-                            <div className={`cart_icon_container ${this.state.totalPrice > 0?'cart_icon_activity':''} ${this.state.receiveInCart?'move_in_cart':''}`}  ref="cartContainer">
+                            <div className={`cart_icon_container ${this.state.totalPrice > 0?'cart_icon_activity':''} ${this.state.receiveInCart?'move_in_cart':''}`}  ref={this.cartContainer}>
                                 <span className="cart_list_length">
                                     {this.state.totalNum||0}
                                 </span>
@@ -414,7 +432,6 @@ export default class Shop extends React.Component {
                         <section className={`gotopay ${this.state.minimumOrderAmount <= 0?'gotopay_acitvity':''}`} >
                             {minimumOrderAmount?<span className="gotopay_button_style" >还差¥{minimumOrderAmount}起送</span>
                             :<span className="gotopay_button_style">去结算</span>}
-                            {/* <router-link :to="{path:'/confirmOrder', query:{geohash, shopId}}" className="gotopay_button_style" v-else >去结算</router-link> */}
                         </section>
                     </section>
                     <div className="toggle-cart" >
@@ -423,9 +440,7 @@ export default class Shop extends React.Component {
                             <header>
                                 <h4>购物车</h4>
                                 <div onClick={this.clearCart}>
-                                    {/* <svg>
-                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-remove"></use>
-                                    </svg> */}
+                                   
                                     <span className="clear_cart">清空</span>
                                 </div>
                             </header>
@@ -470,10 +485,6 @@ export default class Shop extends React.Component {
             {this.state.showSpecs?<div className="specs_list" >
                 <header className="specs_list_header">
                     <h4 className="ellipsis">{this.state.choosedFoods.name}</h4>
-                    {/* <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" version="1.1"className="specs_cancel" @click="showChooseList">
-                        <line x1="0" y1="0" x2="16" y2="16"  stroke="#666" stroke-width="1.2"/>
-                        <line x1="0" y1="16" x2="16" y2="0"  stroke="#666" stroke-width="1.2"/>
-                    </svg> */}
                 </header>
                 <section className="specs_details">
                     <h5 className="specs_details_title">{this.state.choosedFoods.specifications[0].name}</h5>
