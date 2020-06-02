@@ -114,7 +114,7 @@ export default class Shop extends React.Component {
                    this.setState({
                      showCartList: this.state.cartFoodList.length
                        ? !this.state.showCartList
-                       : true
+                       : true,
                    });
                  };
                  //清除购物车
@@ -169,6 +169,8 @@ export default class Shop extends React.Component {
                        });
                        this.setState({
                          cartFoodList,
+                       }, () => { 
+                           this.getTotalNum();
                        });
                        newArr[index] = num;
                      } else {
@@ -176,7 +178,6 @@ export default class Shop extends React.Component {
                      }
                    });
                    this.setState({
-                     // totalPrice:this.state.totalPrice.toFixed(2),
                      categoryNum: [...newArr],
                    });
                  };
@@ -363,22 +364,15 @@ export default class Shop extends React.Component {
                  }
                  //购物车中总共商品的数量
                  getTotalNum = () => {
-                   console.log(
-                     "cartFoodList_TotalNum",
-                     this.state.cartFoodList
-                   );
-                   setTimeout(() => { 
-                       let num = 1;
-                       this.state.cartFoodList.forEach((item) => {
-                         num += item.num;
-                       });
-                       this.setState({
-                         totalNum: num,
-                       });
-                   })
-                  
+                     let num = 0;
+                     this.state.cartFoodList.forEach((item) => {
+                       num += item.num;
+                     });
+                     this.setState({
+                       totalNum: num,
+                     });
                  };
-                 initCategoryNum = () => {
+                 getShopCart = () => {
                    let cartList = store.getState().cartList;
                    let shopCart = {};
                    if (cartList && cartList[this.state.shopId]) {
@@ -386,10 +380,11 @@ export default class Shop extends React.Component {
                    }
                    this.setState({
                      shopCart: shopCart,
+                   }, () => { 
+                        
+                        this.initCategoryNum();
                    });
-                   this.initCategoryNum();
                  };
-
                  get deliveryFee() {
                    if (this.state.shopDetailData) {
                      return this.state.shopDetailData.float_delivery_fee;
@@ -412,8 +407,8 @@ export default class Shop extends React.Component {
                  async componentDidMount() {
                    await this.initData();
                    this.getFoodListHeight();
-                   store.subscribe(this.getTotalNum); //购物车数量
                    store.subscribe(this.getShopCart); // 购物车列表
+                  //  store.subscribe(this.getTotalNum); //购物车数量
                  }
                  render() {
                    return (
@@ -708,7 +703,7 @@ export default class Shop extends React.Component {
                            </section>
                            <div className="toggle-cart">
                              {this.state.showCartList &&
-                             this.state.cartFoodList.length ?
+                             this.state.cartFoodList.length ? (
                                <section className="cart_food_list">
                                  <header>
                                    <h4>购物车</h4>
@@ -721,65 +716,67 @@ export default class Shop extends React.Component {
                                    id="cartFood"
                                  >
                                    <ul>
-                                     {this.state.cartFoodList.map((item, index) => {
-                                       return (
-                                         <li
-                                           key={index}
-                                           className="cart_food_li"
-                                         >
-                                           <div className="cart_list_num">
-                                             <p className="ellipsis">
-                                               {item.name}
-                                             </p>
-                                             <p className="ellipsis">
-                                               {item.specs}
-                                             </p>
-                                           </div>
-                                           <div className="cart_list_price">
-                                             <span>¥</span>
-                                             <span>{item.price}</span>
-                                           </div>
-                                           <section className="cart_list_control">
-                                             <span
-                                               onClick={this.removeOutCart.bind(
-                                                 this,
-                                                 item.category_id,
-                                                 item.item_id,
-                                                 item.food_id,
-                                                 item.name,
-                                                 item.price,
-                                                 item.specs
-                                               )}
-                                             >
-                                               <MinusCircleOutlined />
-                                             </span>
-                                             <span className="cart_num">
-                                               {item.num}
-                                             </span>
-                                             <span
-                                               className="cart_add"
-                                               onClick={this.addToCart.bind(
-                                                 this,
-                                                 item.category_id,
-                                                 item.item_id,
-                                                 item.food_id,
-                                                 item.name,
-                                                 item.price,
-                                                 item.specs
-                                               )}
-                                             >
-                                               <PlusOutlined />
-                                             </span>
-                                           </section>
-                                         </li>
-                                       );
-                                     })}
+                                     {this.state.cartFoodList.map(
+                                       (item, index) => {
+                                         return (
+                                           <li
+                                             key={index}
+                                             className="cart_food_li"
+                                           >
+                                             <div className="cart_list_num">
+                                               <p className="ellipsis">
+                                                 {item.name}
+                                               </p>
+                                               <p className="ellipsis">
+                                                 {item.specs}
+                                               </p>
+                                             </div>
+                                             <div className="cart_list_price">
+                                               <span>¥</span>
+                                               <span>{item.price}</span>
+                                             </div>
+                                             <section className="cart_list_control">
+                                               <span
+                                                 onClick={this.removeOutCart.bind(
+                                                   this,
+                                                   item.category_id,
+                                                   item.item_id,
+                                                   item.food_id,
+                                                   item.name,
+                                                   item.price,
+                                                   item.specs
+                                                 )}
+                                               >
+                                                 <MinusCircleOutlined />
+                                               </span>
+                                               <span className="cart_num">
+                                                 {item.num}
+                                               </span>
+                                               <span
+                                                 className="cart_add"
+                                                 onClick={this.addToCart.bind(
+                                                   this,
+                                                   item.category_id,
+                                                   item.item_id,
+                                                   item.food_id,
+                                                   item.name,
+                                                   item.price,
+                                                   item.specs
+                                                 )}
+                                               >
+                                                 <PlusOutlined />
+                                               </span>
+                                             </section>
+                                           </li>
+                                         );
+                                       }
+                                     )}
                                    </ul>
                                  </section>
                                </section>
-                             : '' }
-                               
-                            
+                             ) : (
+                               ""
+                             )}
                            </div>
                            <div className="fade">
                              {this.state.showCartList &&

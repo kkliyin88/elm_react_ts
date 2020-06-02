@@ -72,7 +72,6 @@ function add_cart(state,{
 			};
         }
         //存入localStorage
-    console.log('add_cart_reduce', cart)
         setStore('buyCart', cart);
 		return cart
 }
@@ -82,7 +81,6 @@ function reduce_cart(state, {
     item_id,
     food_id,
 }) {
-    console.log(shopid, category_id, item_id, food_id);
     let cart = Object.assign({}, state.cartList);
     let shop = (cart[shopid] || {});
     let category = (shop[category_id] || {});
@@ -102,7 +100,6 @@ function reduce_cart(state, {
 }
 
 const reducer = (state=initState,action)=>{
-    console.log('reducer_state',state)
     switch(action.type){ 
         case 'change_city':
             return Object.assign({}, state, {
@@ -120,7 +117,6 @@ const reducer = (state=initState,action)=>{
               })
             break; 
         case 'add_cart':
-            console.log('state_reducer',state)
             return Object.assign({}, state, {
                 cartList: add_cart(state,action.value),
               })
