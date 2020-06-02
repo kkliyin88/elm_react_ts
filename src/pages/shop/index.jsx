@@ -8,6 +8,7 @@ import {shopDetails,foodMenu,ratingScores,ratingTags} from '../../service';
 import Buycar from '../../components/buycar/index.jsx';
 import { getImgPath} from '../../components/mixin.js';
 import BScroll from 'better-scroll'
+import { resolveOnChange } from 'antd/lib/input/Input';
 export default class Shop extends React.Component {
   constructor(props){
     super(props);
@@ -58,17 +59,16 @@ export default class Shop extends React.Component {
     }
   }
   //name: "美食店111222", address: "广东省潮州市潮安区 ", id: 3269, latitude: 32.095092, longitude: 118.914433
-  async initData(){
-    //评论列表
-    // this.ratingList = await getRatingList(this.shopId, this.ratingOffset);
-   
-    this.setState({
-      shopDetailData:await shopDetails(this.state.shopId, this.state.latitude, this.state.longitude),
-      menuList:await foodMenu(this.state.shopId),//获取商铺食品列表
-      ratingScoresData: await ratingScores(this.state.shopId),//商铺评论详情
-      ratingTagsList : await ratingTags(this.state.shopId)//评论Tag列表
-    })
-  }
+    async initData(){
+        //评论列表
+        // this.ratingList = await getRatingList(this.shopId, this.ratingOffset);
+       let menuList= await foodMenu(this.state.shopId);
+       let shopDetailData= await shopDetails(this.state.shopId, this.state.latitude, this.state.longitude);
+       let ratingScoresData = await ratingScores(this.state.shopId)//商铺评论详情
+       let ratingTagsList = await ratingTags(this.state.shopId)//评论Tag列表
+       this.setState({menuList,shopDetailData,ratingScoresData,ratingTagsList})
+       
+   }
   chooseMenu(index){
     this.setState({
         menuIndex: index,
@@ -194,39 +194,42 @@ export default class Shop extends React.Component {
         }
     }
     //获取食品列表的高度，存入shopListTop
-    async getFoodListHeight(){
-        let menuFoodList_li = this.menuFoodList.current.children;
-        console.log('menuFoodList_li',menuFoodList_li);
-        console.log('menuFoodList_li_type',typeof menuFoodList_li)
-        // let  listArr = await Array.from(menuFoodList_li);
-        // console.log('listArr',listArr);
-        // for(let i=0;i<listArr.length;i++){
-        //     console.log('item',listArr[i]);
-        // }
+    getFoodListHeight(){
+        let listContainer = this.menuFoodList.current.children[0].children;
+        if (listContainer) {
+            let  listArr =Array.from(listContainer);
+            let shopListTop = []
+            listArr.map((item,index)=>{
+                shopListTop[index] = item.offsetTop
+            });
+            this.setState({
+                shopListTop
+            });
+            this.listenScroll(this.menuFoodList.current)
+          }
         
     }
     //当滑动食品列表时，监听其scrollTop值来设置对应的食品列表标题的样式
-    listenScroll(element){
+    listenScroll=(element)=>{
+        console.log('element',element);
+        let foodScroll = new BScroll(element);
+        console.log('foodScroll',foodScroll);
         this.setState({
-            foodScroll:new BScroll(element, {
-                probeType: 3,
-                deceleration: 0.001,
-                bounce: false,
-                swipeTime: 2000,
-                click: true,
-            })
+            foodScroll
+        },()=>{
+            console.log('foodScroll',this.state.foodScroll);
+            
         })
-
         const wrapperMenu = new BScroll('#wrapper_menu', {
             click: true,
         });
-        const wrapMenuHeight = this.$refs.wrapperMenu.clientHeight;
-        this.foodScroll.on('scroll', (pos) => {
+        const wrapMenuHeight = this.wrapperMenu.clientHeight;
+        this.state.foodScroll.on('scroll', (pos) => {
             if (!this.wrapperMenu) {
                 return
             }
-            this.shopListTop.forEach((item, index) => {
-                if (this.menuIndexChange && Math.abs(Math.round(pos.y)) >= item) {
+            this.state.shopListTop.forEach((item, index) => {
+                if (this.state.menuIndexChange && Math.abs(Math.round(pos.y)) >= item) {
                     this.setState({
                        menuIndex : index
                     })
@@ -297,12 +300,10 @@ export default class Shop extends React.Component {
             return null;
         }
     }
-  componentDidMount() {
-    this.initData();
-    setTimeout(()=>{
-        this.getFoodListHeight();
-    },100)
     
+   async componentDidMount() {
+    await this.initData();
+    this.getFoodListHeight();
     store.subscribe(this.getTotalNum); //购物车数量
     store.subscribe(this.getShopCart); // 购物车列表
     
@@ -330,8 +331,8 @@ export default class Shop extends React.Component {
                     </div>
                 </section>
             </header>
-            <div >
-                <section  className="food_container">
+           
+            <section  className="food_container">
                     <section className="menu_container">
                         <section className="menu_left" id="wrapper_menu" ref={this.wrapperMenu}>
                             <ul>
@@ -348,8 +349,8 @@ export default class Shop extends React.Component {
                                     }
                             </ul>
                         </section>
-                        <section className="menu_right" >
-                            <ul ref={this.menuFoodList}>
+                        <section className="menu_right" ref={this.menuFoodList} >
+                            <ul >
                                 { this.state.menuList.map((item,index)=>{
                                     return (<li key={index} >
                                         <header className="menu_detail_header">
@@ -479,7 +480,7 @@ export default class Shop extends React.Component {
                         {this.state.showCartList&&this.state.cartFoodList.length?<div className="screen_cover"  onClick={this.toggleCartList}></div>:''}
                     </div>
                 </section>
-            </div >
+            
         </section>
         <section name="fadeBounce">
             {this.state.showSpecs?<div className="specs_list" >
