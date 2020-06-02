@@ -1,7 +1,7 @@
 import React from "react";
 import "./index.css";
 import store from "../../redux/store";
-import { add_cart, reduce_car, clear_cart } from "../../redux/action";
+import { add_cart, reduce_cart, clear_cart } from "../../redux/action";
 import {
   ShoppingCartOutlined,
   PlusOutlined,
@@ -114,7 +114,7 @@ export default class Shop extends React.Component {
                    this.setState({
                      showCartList: this.state.cartFoodList.length
                        ? !this.state.showCartList
-                       : true,
+                       : true
                    });
                  };
                  //清除购物车
@@ -167,7 +167,6 @@ export default class Shop extends React.Component {
                            }
                          });
                        });
-                       console.log("cartFoodList_test", cartFoodList);
                        this.setState({
                          cartFoodList,
                        });
@@ -331,7 +330,7 @@ export default class Shop extends React.Component {
                  //加入购物车，所需7个参数，商铺id，食品分类id，食品id，食品规格id，食品名字，食品价格，食品规格
                  addToCart(category_id, item_id, food_id, name, price, specs) {
                    let action = add_cart({
-                     shopid: this.sate.shopId,
+                     shopid: this.state.shopId,
                      category_id,
                      item_id,
                      food_id,
@@ -351,7 +350,7 @@ export default class Shop extends React.Component {
                    price,
                    specs
                  ) {
-                   let action = reduce_car({
+                   let action = reduce_cart({
                      shopid: this.props.shopId,
                      category_id,
                      item_id,
@@ -364,15 +363,22 @@ export default class Shop extends React.Component {
                  }
                  //购物车中总共商品的数量
                  getTotalNum = () => {
-                   let num = 1;
-                   this.state.cartFoodList.forEach((item) => {
-                     num += item.num;
-                   });
-                   this.setState({
-                     totalNum: num,
-                   });
+                   console.log(
+                     "cartFoodList_TotalNum",
+                     this.state.cartFoodList
+                   );
+                   setTimeout(() => { 
+                       let num = 1;
+                       this.state.cartFoodList.forEach((item) => {
+                         num += item.num;
+                       });
+                       this.setState({
+                         totalNum: num,
+                       });
+                   })
+                  
                  };
-                 getShopCart = () => {
+                 initCategoryNum = () => {
                    let cartList = store.getState().cartList;
                    let shopCart = {};
                    if (cartList && cartList[this.state.shopId]) {
@@ -393,7 +399,6 @@ export default class Shop extends React.Component {
                  }
                  //还差多少元起送，为负数时显示去结算按钮
                  get minimumOrderAmount() {
-                   
                    if (this.state.shopDetailData) {
                      return (
                        this.state.shopDetailData.float_minimum_order_amount -
@@ -411,8 +416,6 @@ export default class Shop extends React.Component {
                    store.subscribe(this.getShopCart); // 购物车列表
                  }
                  render() {
-                   const deliveryFee = this.deliveryFee;
-                   const minimumOrderAmount = this.minimumOrderAmount;
                    return (
                      <div>
                        <section className="shop_container">
@@ -660,7 +663,7 @@ export default class Shop extends React.Component {
                            </section>
                            <section className="buy_cart_container">
                              <section
-                               onClick={this.toggleCartList}
+                               onClick={this.toggleCartList.bind(this)}
                                className="cart_icon_num"
                              >
                                <div
@@ -682,19 +685,19 @@ export default class Shop extends React.Component {
                                </div>
                                <div className="cart_num">
                                  <div>¥ {this.state.totalPrice}</div>
-                                 <div>配送费¥{deliveryFee}</div>
+                                 <div>配送费¥{this.deliveryFee}</div>
                                </div>
                              </section>
                              <section
                                className={`gotopay ${
-                                 this.state.minimumOrderAmount <= 0
+                                 this.minimumOrderAmount <= 0
                                    ? "gotopay_acitvity"
                                    : ""
                                }`}
                              >
-                               {minimumOrderAmount ? (
+                               {this.minimumOrderAmount > 0 ? (
                                  <span className="gotopay_button_style">
-                                   还差¥{minimumOrderAmount}起送
+                                   还差¥{this.minimumOrderAmount}起送
                                  </span>
                                ) : (
                                  <span className="gotopay_button_style">
@@ -705,7 +708,7 @@ export default class Shop extends React.Component {
                            </section>
                            <div className="toggle-cart">
                              {this.state.showCartList &&
-                             this.state.cartFoodList.length ? (
+                             this.state.cartFoodList.length ?
                                <section className="cart_food_list">
                                  <header>
                                    <h4>购物车</h4>
@@ -718,7 +721,7 @@ export default class Shop extends React.Component {
                                    id="cartFood"
                                  >
                                    <ul>
-                                     {this.state.cartFoodList((item, index) => {
+                                     {this.state.cartFoodList.map((item, index) => {
                                        return (
                                          <li
                                            key={index}
@@ -774,9 +777,9 @@ export default class Shop extends React.Component {
                                    </ul>
                                  </section>
                                </section>
-                             ) : (
-                               ""
-                             )}
+                             : '' }
+                               
+                            
                            </div>
                            <div className="fade">
                              {this.state.showCartList &&

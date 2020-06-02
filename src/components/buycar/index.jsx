@@ -2,7 +2,7 @@
 import  React from 'react';
 import './index.css';
 import store from '../../redux/store';
-import {add_cart,reduce_car} from '../../redux/action';
+import {add_cart,reduce_cart} from '../../redux/action';
 import {MinusCircleOutlined,PlusCircleOutlined} from '@ant-design/icons';
 export default class Buycar extends React.Component {
   constructor(props){
@@ -26,7 +26,18 @@ export default class Buycar extends React.Component {
     // this.$emit('showMoveDot', this.showMoveDot, elLeft, elBottom);
    }
   removeOutCart(category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock){
-    let action =  reduce_car({shopid: this.props.shopId, category_id, item_id, food_id, name, price, specs, packing_fee, sku_id, stock})
+    let action = reduce_cart({
+      shopid: this.props.shopId,
+      category_id,
+      item_id,
+      food_id,
+      name,
+      price,
+      specs,
+      packing_fee,
+      sku_id,
+      stock,
+    });
     if (this.foodNum > 0) {
       store.dispatch(action);
      }

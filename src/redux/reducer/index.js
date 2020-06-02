@@ -52,8 +52,7 @@ function add_cart(state,{
     packing_fee,
     sku_id,
     stock
-}){
-
+}) {     
         let cart = Object.assign({}, state.cartList);
 		let shop = cart[shopid] = (cart[shopid] || {});
 		let category = shop[category_id] = (shop[category_id] || {});
@@ -73,7 +72,8 @@ function add_cart(state,{
 			};
         }
         //存入localStorage
-		 setStore('buyCart', state.cartList);
+    console.log('add_cart_reduce', cart)
+        setStore('buyCart', cart);
 		return cart
 }
 function reduce_cart(state, {
@@ -81,10 +81,8 @@ function reduce_cart(state, {
     category_id,
     item_id,
     food_id,
-    name,
-    price,
-    specs,
 }) {
+    console.log(shopid, category_id, item_id, food_id);
     let cart = Object.assign({}, state.cartList);
     let shop = (cart[shopid] || {});
     let category = (shop[category_id] || {});
@@ -93,12 +91,13 @@ function reduce_cart(state, {
         if (item[food_id]['num'] > 0) {
             item[food_id]['num']--;
             //存入localStorage
-            setStore('buyCart', state.cartList);
+         
         } else {
             //商品数量为0，则清空当前商品的信息
             item[food_id] = null;
         }
     }
+    setStore('buyCart', cart);
     return cart
 }
 
@@ -124,14 +123,12 @@ const reducer = (state=initState,action)=>{
             console.log('state_reducer',state)
             return Object.assign({}, state, {
                 cartList: add_cart(state,action.value),
-                test:state.test+100
               })
             break; 
         case 'reduce_cart':
             return  Object.assign({}, state, {
                 cartList: reduce_cart(state,action.value)
               });
-          
             break;
         case 'clear_cart':
             return  Object.assign({}, state, {

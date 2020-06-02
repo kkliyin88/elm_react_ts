@@ -24,9 +24,9 @@ export const add_cart = (value)=>{
         value:value
     }
 }
-export const reduce_car = (value)=>{
+export const reduce_cart = (value)=>{
     return {
-        type:'reduce_car',
+        type:'reduce_cart',
         value:value
     }
 }
