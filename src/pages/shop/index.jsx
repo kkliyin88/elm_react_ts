@@ -66,13 +66,10 @@ export default class Shop extends React.Component {
                      longitude: 118.914433,
                    };
                  }
-                 //name: "美食店111222", address: "广东省潮州市潮安区 ", id: 3269, latitude: 32.095092, longitude: 118.914433
                   async initData() {
                      //redux 从缓存中读取cartList
                      let action = init_cart();
                     await store.dispatch(action);
-                    console.log('shopMsg',store.getState().shopMsg);
-                    
                     // this.setState({
                     //   shopId:store.getState().shopMsg.shopid
                     // })
