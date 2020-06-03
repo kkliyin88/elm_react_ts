@@ -38,6 +38,7 @@ const initState ={
 function clear_cart(state, shopid) {
     let cartList = Object.assign({}, state.cartList) 
     cartList[shopid] = null;
+    console.log('cartList_clear', cartList)
     setStore('buyCart', state.cartList);
     return cartList
 }
@@ -129,7 +130,6 @@ const reducer = (state=initState,action)=>{
         case 'clear_cart':
             return  Object.assign({}, state, {
                 cartList: clear_cart(state,action.value),
-                
               });
             break;                         
         default:

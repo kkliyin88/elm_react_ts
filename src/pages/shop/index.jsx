@@ -114,15 +114,24 @@ export default class Shop extends React.Component {
                    this.setState({
                      showCartList: this.state.cartFoodList.length
                        ? !this.state.showCartList
-                       : true,
+                       : false
                    });
                  };
                  //清除购物车
-                 clearCart() {
-                   this.toggleCartList();
+                 clearCart=()=>{
                    let action = clear_cart(this.state.shopId);
-                   store.dispatch(action);
+                    store.dispatch(action);
+                    this.getShopCart();
                  }
+                computedTotalPrice = (cartFoodList) => {
+                  let price = 0
+                  cartFoodList.map((item) => { 
+                   price = price + item.num * item.price
+                  })
+                  this.setState({
+                    totalPrice: price
+                  });
+                 };
                  initCategoryNum = () => {
                    //标记每个类目的购买数量
                    let newArr = [];
@@ -147,11 +156,6 @@ export default class Shop extends React.Component {
                            ][itemid][foodid];
                            num = num + foodItem.num;
                            if (item.type == 1) {
-                             this.setState({
-                               totalPrice:
-                                 this.state.totalPrice +
-                                 foodItem.num * foodItem.price,
-                             });
                              if (foodItem.num > 0) {
                                cartFoodList[cartFoodNum] = {};
                                cartFoodList[cartFoodNum].category_id =
@@ -167,16 +171,20 @@ export default class Shop extends React.Component {
                            }
                          });
                        });
-                       this.setState({
-                         cartFoodList,
-                       }, () => { 
-                           this.getTotalNum();
-                       });
                        newArr[index] = num;
                      } else {
                        newArr[index] = 0;
                      }
                    });
+                   this.setState(
+                     {
+                       cartFoodList,
+                     },
+                     () => {
+                       this.computedTotalPrice(this.state.cartFoodList);
+                       this.getTotalNum();
+                     }
+                   );
                    this.setState({
                      categoryNum: [...newArr],
                    });
@@ -352,7 +360,7 @@ export default class Shop extends React.Component {
                    specs
                  ) {
                    let action = reduce_cart({
-                     shopid: this.props.shopId,
+                     shopid: this.state.shopId,
                      category_id,
                      item_id,
                      food_id,
@@ -364,13 +372,13 @@ export default class Shop extends React.Component {
                  }
                  //购物车中总共商品的数量
                  getTotalNum = () => {
-                     let num = 0;
-                     this.state.cartFoodList.forEach((item) => {
-                       num += item.num;
-                     });
-                     this.setState({
-                       totalNum: num,
-                     });
+                   let num = 0;
+                   this.state.cartFoodList.forEach((item) => {
+                     num += item.num;
+                   });
+                   this.setState({
+                     totalNum: num,
+                   });
                  };
                  getShopCart = () => {
                    let cartList = store.getState().cartList;
@@ -378,12 +386,15 @@ export default class Shop extends React.Component {
                    if (cartList && cartList[this.state.shopId]) {
                      shopCart = cartList[this.state.shopId];
                    }
-                   this.setState({
-                     shopCart: shopCart,
-                   }, () => { 
-                        
-                        this.initCategoryNum();
-                   });
+                   this.setState(
+                     {
+                       shopCart: shopCart,
+                     },
+                     () => {
+                       
+                       this.initCategoryNum();
+                     }
+                   );
                  };
                  get deliveryFee() {
                    if (this.state.shopDetailData) {
@@ -408,7 +419,7 @@ export default class Shop extends React.Component {
                    await this.initData();
                    this.getFoodListHeight();
                    store.subscribe(this.getShopCart); // 购物车列表
-                  //  store.subscribe(this.getTotalNum); //购物车数量
+                   //  store.subscribe(this.getTotalNum); //购物车数量
                  }
                  render() {
                    return (
