@@ -37,4 +37,11 @@ export const clear_cart = (value)=>{
         value:value
     }
 }
+//初次加载网页时从缓存中读取购物车
+export const init_cart = () => {
+    return {
+        type: 'init_cart',
+    }
+}
+
 // module.exports = {change_city,change_place,change_shopMsg,add_cart,reduce_car}

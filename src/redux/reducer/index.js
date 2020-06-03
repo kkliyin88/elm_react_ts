@@ -32,16 +32,22 @@ const initState ={
     place:{},//城市所选的具体位置,
     shopMsg:{}, //保存门店信息
     cartList:[],//加入购物车的商品列表
-    test:123
+}
+function init_cart(state){
+    let initCart = getStore('buyCart');
+    if (initCart) {
+        return  JSON.parse(initCart);
+    }
+     
 }
 //清空当前商品的购物车信息
 function clear_cart(state, shopid) {
     let cartList = Object.assign({}, state.cartList) 
     cartList[shopid] = null;
-    console.log('cartList_clear', cartList)
     setStore('buyCart', state.cartList);
     return cartList
 }
+
 function add_cart(state,{
     shopid,
     category_id,
@@ -131,7 +137,12 @@ const reducer = (state=initState,action)=>{
             return  Object.assign({}, state, {
                 cartList: clear_cart(state,action.value),
               });
-            break;                         
+            break; 
+        case 'init_cart':
+            return Object.assign({}, state, {
+                cartList: init_cart(state),
+            });
+            break; 
         default:
             return state
     }

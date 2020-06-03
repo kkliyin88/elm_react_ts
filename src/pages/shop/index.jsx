@@ -1,7 +1,12 @@
 import React from "react";
 import "./index.css";
 import store from "../../redux/store";
-import { add_cart, reduce_cart, clear_cart } from "../../redux/action";
+import {
+  add_cart,
+  reduce_cart,
+  clear_cart,
+  init_cart,
+} from "../../redux/action";
 import {
   ShoppingCartOutlined,
   PlusOutlined,
@@ -20,7 +25,7 @@ export default class Shop extends React.Component {
                    this.cartContainer = React.createRef();
                    this.state = {
                      geohash: "", //geohash位置信息
-                     shopId: 3269, //商店id值,
+                     shopId: store.getState().shopMsg.id || 3269, //商店id值,
                      shopCart: {},
                      total: 0, //在本店铺的购物车数量
                      // geohash:store.getState().city.geohash,
@@ -62,24 +67,35 @@ export default class Shop extends React.Component {
                    };
                  }
                  //name: "美食店111222", address: "广东省潮州市潮安区 ", id: 3269, latitude: 32.095092, longitude: 118.914433
-                 async initData() {
-                   //评论列表
-                   // this.ratingList = await getRatingList(this.shopId, this.ratingOffset);
-                   let menuList = await foodMenu(this.state.shopId);
-                   let shopDetailData = await shopDetails(
-                     this.state.shopId,
-                     this.state.latitude,
-                     this.state.longitude
-                   );
-                   let ratingScoresData = await ratingScores(this.state.shopId); //商铺评论详情
-                   let ratingTagsList = await ratingTags(this.state.shopId); //评论Tag列表
-                   this.setState({
-                     menuList,
-                     shopDetailData,
-                     ratingScoresData,
-                     ratingTagsList,
-                   });
-                 }
+                  async initData() {
+                     //redux 从缓存中读取cartList
+                     let action = init_cart();
+                    await store.dispatch(action);
+                    console.log('shopMsg',store.getState().shopMsg);
+                    
+                    // this.setState({
+                    //   shopId:store.getState().shopMsg.shopid
+                    // })
+                     //评论列表
+                     // this.ratingList = await getRatingList(this.shopId, this.ratingOffset);
+                     let menuList = await foodMenu(this.state.shopId);
+                     let shopDetailData = await shopDetails(
+                       this.state.shopId,
+                       this.state.latitude,
+                       this.state.longitude
+                     );
+                     let ratingScoresData = await ratingScores(
+                       this.state.shopId
+                     ); //商铺评论详情
+                     let ratingTagsList = await ratingTags(this.state.shopId); //评论Tag列表
+                     this.setState({
+                       menuList,
+                       shopDetailData,
+                       ratingScoresData,
+                       ratingTagsList,
+                     });
+                     this.getShopCart();
+                   }
                  chooseMenu(index) {
                    this.setState({
                      menuIndex: index,
@@ -391,7 +407,6 @@ export default class Shop extends React.Component {
                        shopCart: shopCart,
                      },
                      () => {
-                       
                        this.initCategoryNum();
                      }
                    );
@@ -414,9 +429,9 @@ export default class Shop extends React.Component {
                      return null;
                    }
                  }
-
-                 async componentDidMount() {
-                   await this.initData();
+                
+                async componentDidMount() {
+                  await this.initData();
                    this.getFoodListHeight();
                    store.subscribe(this.getShopCart); // 购物车列表
                    //  store.subscribe(this.getTotalNum); //购物车数量
