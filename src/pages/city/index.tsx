@@ -1,5 +1,5 @@
 //about.js
-import React from 'react';
+import * as React from "react";
 import './index.css';
 import { searchplace} from '../../service/index.js';
 import {getStore, setStore, removeStore} from '../../config/mUtils'
@@ -8,8 +8,8 @@ import Header from '../../components/header/index.jsx';
 import store from '../../redux/store';
 import {change_city,change_place} from '../../redux/action';
 
-export default class City extends React.Component {
-  constructor(props) {
+export default class City extends React.Component<any,any> {
+  constructor(props:any) {
       super(props);
       this.state = {
         inputVaule:'', // 搜索地址
@@ -30,11 +30,12 @@ export default class City extends React.Component {
         cityid:store.getState().city.id,
         cityname:store.getState().city.name
       })
-      console.log('state',this.state)
     //获取本地查询记录
     if (getStore('placeHistory')) {
+      let placelist:any = getStore('placeHistory');
+      placelist = JSON.parse(placelist);
       this.setState({
-        placelist:JSON.parse(getStore('placeHistory'))
+        placelist
       })
     }else{
       this.setState({
@@ -42,7 +43,7 @@ export default class City extends React.Component {
       })
     } 
   }
-  inptChange(event){
+  inptChange(event:any){
     this.setState({
       inputVaule:event.target.value
     })
@@ -63,16 +64,14 @@ export default class City extends React.Component {
           })
       }
   }
-  nextpage(index,item){
-    console.log('item',item);
-    
+  nextpage(index:any,item:any){
     let history = getStore('placeHistory');
     let choosePlace = this.state.placelist[index];
     let  placeHistory = []
     if (history) { //
         let checkrepeat = false;
         placeHistory = JSON.parse(history)
-        placeHistory.forEach(itemm => {
+        placeHistory.forEach((itemm:any) => {
             if (itemm.geohash === item.geohash) {
                 checkrepeat = true;
             }
@@ -103,7 +102,7 @@ export default class City extends React.Component {
             </div>
           </section>
           <ul className="getpois_ul">
-            {this.state.placelist.map((item,i)=>{
+            {this.state.placelist.map((item:any,i:any)=>{
               return (
                 <li key={i} onClick={this.nextpage.bind(this,i,item)}>
                    <h4 className="pois_name ellipsis">{item.name}</h4>

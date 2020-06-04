@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import "./index.css";
 import store from "../../redux/store";
 import {
@@ -15,10 +15,18 @@ import {
 import { shopDetails, foodMenu, ratingScores, ratingTags } from "../../service";
 import Buycar from "../../components/buycar/index.jsx";
 import { getImgPath } from "../../components/mixin.js";
-import BScroll from "better-scroll";
+import * as BScroll from "better-scroll";
 import { resolveOnChange } from "antd/lib/input/Input";
-export default class Shop extends React.Component {
-                 constructor(props) {
+
+// interface shop { 
+//   menuFoodList: any,
+//   wrapperMenu:any,
+//   cartContainer: any,
+//   state:any
+// }
+
+export default class Shop extends React.Component<any, any> {
+                 constructor(props: any) {
                    super(props);
                    this.menuFoodList = React.createRef();
                    this.wrapperMenu = React.createRef();
@@ -66,51 +74,33 @@ export default class Shop extends React.Component {
                      longitude: 118.914433,
                    };
                  }
-                  async initData() {
-                     //redux 从缓存中读取cartList
-                     let action = init_cart();
-                    await store.dispatch(action);
-                    // this.setState({
-                    //   shopId:store.getState().shopMsg.shopid
-                    // })
-                     //评论列表
-                     // this.ratingList = await getRatingList(this.shopId, this.ratingOffset);
-                     let menuList = await foodMenu(this.state.shopId);
-                     let shopDetailData = await shopDetails(
-                       this.state.shopId,
-                       this.state.latitude,
-                       this.state.longitude
-                     );
-                     let ratingScoresData = await ratingScores(
-                       this.state.shopId
-                     ); //商铺评论详情
-                     let ratingTagsList = await ratingTags(this.state.shopId); //评论Tag列表
-                     this.setState({
-                       menuList,
-                       shopDetailData,
-                       ratingScoresData,
-                       ratingTagsList,
-                     });
-                     this.getShopCart();
-                   }
-                 chooseMenu(index) {
-                   this.setState({
-                     menuIndex: index,
-                     menuIndexChange: false,
-                   });
-                   //menuIndexChange解决运动时listenScroll依然监听的bug
-                   this.state.foodScroll.scrollTo(
-                     0,
-                     -this.shopListTop[index],
-                     400
+                 async initData() {
+                   //redux 从缓存中读取cartList
+                   let action = init_cart();
+                   await store.dispatch(action);
+                   // this.setState({
+                   //   shopId:store.getState().shopMsg.shopid
+                   // })
+                   //评论列表
+                   // this.ratingList = await getRatingList(this.shopId, this.ratingOffset);
+                   let menuList = await foodMenu(this.state.shopId);
+                   let shopDetailData = await shopDetails(
+                     this.state.shopId,
+                     this.state.latitude,
+                     this.state.longitude
                    );
-                   this.state.foodScroll.on("scrollEnd", () => {
-                     this.setState({
-                       menuIndexChange: true,
-                     });
+                   let ratingScoresData = await ratingScores(this.state.shopId); //商铺评论详情
+                   let ratingTagsList = await ratingTags(this.state.shopId); //评论Tag列表
+                   this.setState({
+                     menuList,
+                     shopDetailData,
+                     ratingScoresData,
+                     ratingTagsList,
                    });
+                   this.getShopCart();
                  }
-                 showTitleDetail(index) {
+
+                 showTitleDetail(index: number) {
                    if (this.state.TitleDetailIndex == index) {
                      this.setState({
                        TitleDetailIndex: null,
@@ -127,30 +117,30 @@ export default class Shop extends React.Component {
                    this.setState({
                      showCartList: this.state.cartFoodList.length
                        ? !this.state.showCartList
-                       : false
+                       : false,
                    });
                  };
                  //清除购物车
-                 clearCart=()=>{
+                 clearCart = () => {
                    let action = clear_cart(this.state.shopId);
-                    store.dispatch(action);
-                    this.getShopCart();
-                 }
-                computedTotalPrice = (cartFoodList) => {
-                  let price = 0
-                  cartFoodList.map((item) => { 
-                   price = price + item.num * item.price
-                  })
-                  this.setState({
-                    totalPrice: price
-                  });
+                   store.dispatch(action);
+                   this.getShopCart();
+                 };
+                 computedTotalPrice = (cartFoodList: any) => {
+                   let price = 0;
+                   cartFoodList.map((item: any) => {
+                     price = price + item.num * item.price;
+                   });
+                   this.setState({
+                     totalPrice: price,
+                   });
                  };
                  initCategoryNum = () => {
                    //标记每个类目的购买数量
-                   let newArr = [];
+                   let newArr: any = [];
                    let cartFoodNum = 0;
-                   let cartFoodList = [];
-                   this.state.menuList.forEach((item, index) => {
+                   let cartFoodList: any = [];
+                   this.state.menuList.forEach((item: any, index: number) => {
                      if (
                        this.state.shopCart &&
                        this.state.shopCart[item.foods[0].category_id]
@@ -227,7 +217,7 @@ export default class Shop extends React.Component {
                    });
                  }
                  //显示规格列表
-                 showChooseList(foods) {
+                 showChooseList(foods: any) {
                    if (foods) {
                      this.setState({
                        showSpecs: !this.state.showSpecs,
@@ -247,8 +237,8 @@ export default class Shop extends React.Component {
                      .children;
                    if (listContainer) {
                      let listArr = Array.from(listContainer);
-                     let shopListTop = [];
-                     listArr.map((item, index) => {
+                     let shopListTop: any = [];
+                     listArr.map((item: any, index: any) => {
                        shopListTop[index] = item.offsetTop;
                      });
                      this.setState({
@@ -273,34 +263,36 @@ export default class Shop extends React.Component {
                      click: true,
                    });
                    const wrapMenuHeight = this.wrapperMenu.clientHeight;
-                   this.state.foodScroll.on("scroll", (pos) => {
+                   this.state.foodScroll.on("scroll", (pos: any) => {
                      if (!this.wrapperMenu) {
                        return;
                      }
-                     this.state.shopListTop.forEach((item, index) => {
-                       if (
-                         this.state.menuIndexChange &&
-                         Math.abs(Math.round(pos.y)) >= item
-                       ) {
-                         this.setState({
-                           menuIndex: index,
-                         });
-                         const menuList = this.wrapperMenu.querySelectorAll(
-                           ".activity_menu"
-                         );
-                         const el = menuList[0];
-                         wrapperMenu.scrollToElement(
-                           el,
-                           800,
-                           0,
-                           -(wrapMenuHeight / 2 - 50)
-                         );
+                     this.state.shopListTop.forEach(
+                       (item: any, index: number) => {
+                         if (
+                           this.state.menuIndexChange &&
+                           Math.abs(Math.round(pos.y)) >= item
+                         ) {
+                           this.setState({
+                             menuIndex: index,
+                           });
+                           const menuList = this.wrapperMenu.querySelectorAll(
+                             ".activity_menu"
+                           );
+                           const el = menuList[0];
+                           wrapperMenu.scrollToElement(
+                             el,
+                             800,
+                             0,
+                             -(wrapMenuHeight / 2 - 50)
+                           );
+                         }
                        }
-                     });
+                     );
                    });
                  };
                  //点击左侧食品列表标题，相应列表移动到最顶层
-                 chooseMenu(index) {
+                 chooseMenu(index: number) {
                    this.setState({
                      menuIndex: index,
                      menuIndexChange: false, //menuIndexChange解决运动时listenScroll依然监听的bug;
@@ -317,25 +309,25 @@ export default class Shop extends React.Component {
                    });
                  }
                  //记录当前所选规格的索引值
-                 chooseSpecs(index) {
+                 chooseSpecs(index: any) {
                    this.setState({
                      specsIndex: index,
                    });
                  }
                  //多规格商品加入购物车
                  addSpecs(
-                   category_id,
-                   item_id,
-                   food_id,
-                   name,
-                   price,
-                   specs,
-                   packing_fee,
-                   sku_id,
-                   stock
+                   category_id: Number,
+                   item_id: Number,
+                   food_id: Number,
+                   name: String,
+                   price: Number,
+                   specs: any,
+                   packing_fee: any,
+                   sku_id: Number,
+                   stock: any
                  ) {
                    let action = add_cart({
-                     shopid: this.sate.shopId,
+                     shopid: this.state.shopId,
                      category_id,
                      item_id,
                      food_id,
@@ -350,7 +342,14 @@ export default class Shop extends React.Component {
                    this.showChooseList();
                  }
                  //加入购物车，所需7个参数，商铺id，食品分类id，食品id，食品规格id，食品名字，食品价格，食品规格
-                 addToCart(category_id, item_id, food_id, name, price, specs) {
+                 addToCart(
+                   category_id: Number,
+                   item_id: Number,
+                   food_id: Number,
+                   name: String,
+                   price: any,
+                   specs: any
+                 ) {
                    let action = add_cart({
                      shopid: this.state.shopId,
                      category_id,
@@ -365,12 +364,12 @@ export default class Shop extends React.Component {
 
                  //移出购物车，所需7个参数，商铺id，食品分类id，食品id，食品规格id，食品名字，食品价格，食品规格
                  removeOutCart(
-                   category_id,
-                   item_id,
-                   food_id,
-                   name,
-                   price,
-                   specs
+                   category_id: Number,
+                   item_id: Number,
+                   food_id: Number,
+                   name: String,
+                   price: any,
+                   specs: any
                  ) {
                    let action = reduce_cart({
                      shopid: this.state.shopId,
@@ -386,7 +385,7 @@ export default class Shop extends React.Component {
                  //购物车中总共商品的数量
                  getTotalNum = () => {
                    let num = 0;
-                   this.state.cartFoodList.forEach((item) => {
+                   this.state.cartFoodList.forEach((item: any) => {
                      num += item.num;
                    });
                    this.setState({
@@ -426,9 +425,9 @@ export default class Shop extends React.Component {
                      return null;
                    }
                  }
-                
-                async componentDidMount() {
-                  await this.initData();
+
+                 async componentDidMount() {
+                   await this.initData();
                    this.getFoodListHeight();
                    store.subscribe(this.getShopCart); // 购物车列表
                    //  store.subscribe(this.getTotalNum); //购物车数量
@@ -480,42 +479,44 @@ export default class Shop extends React.Component {
                                ref={this.wrapperMenu}
                              >
                                <ul>
-                                 {this.state.menuList.map((item, index) => {
-                                   return (
-                                     <li
-                                       key={index}
-                                       className={`menu_left_li ${
-                                         index === this.state.menuIndex
-                                           ? "activity_menu"
-                                           : ""
-                                       }`}
-                                       onClick={this.chooseMenu.bind(
-                                         this,
-                                         index
-                                       )}
-                                     >
-                                       {item.icon_url ? (
-                                         <img
-                                           src={getImgPath.bind(
-                                             this,
-                                             item.icon_url
-                                           )}
-                                         />
-                                       ) : (
-                                         ""
-                                       )}
-                                       <span>{item.name}</span>
-                                       {this.state.categoryNum[index] &&
-                                       item.type === 1 ? (
-                                         <span className="category_num">
-                                           {this.state.categoryNum[index]}
-                                         </span>
-                                       ) : (
-                                         ""
-                                       )}
-                                     </li>
-                                   );
-                                 })}
+                                 {this.state.menuList.map(
+                                   (item: any, index: number) => {
+                                     return (
+                                       <li
+                                         key={index}
+                                         className={`menu_left_li ${
+                                           index === this.state.menuIndex
+                                             ? "activity_menu"
+                                             : ""
+                                         }`}
+                                         onClick={this.chooseMenu.bind(
+                                           this,
+                                           index
+                                         )}
+                                       >
+                                         {item.icon_url ? (
+                                           <img
+                                             src={getImgPath.bind(
+                                               this,
+                                               item.icon_url
+                                             )}
+                                           />
+                                         ) : (
+                                           ""
+                                         )}
+                                         <span>{item.name}</span>
+                                         {this.state.categoryNum[index] &&
+                                         item.type === 1 ? (
+                                           <span className="category_num">
+                                             {this.state.categoryNum[index]}
+                                           </span>
+                                         ) : (
+                                           ""
+                                         )}
+                                       </li>
+                                     );
+                                   }
+                                 )}
                                </ul>
                              </section>
                              <section
@@ -523,159 +524,173 @@ export default class Shop extends React.Component {
                                ref={this.menuFoodList}
                              >
                                <ul>
-                                 {this.state.menuList.map((item, index) => {
-                                   return (
-                                     <li key={index}>
-                                       <header className="menu_detail_header">
-                                         <section className="menu_detail_header_left">
-                                           <strong className="menu_item_title">
-                                             {item.name}
-                                           </strong>
-                                           <span className="menu_item_description">
-                                             {item.description}
-                                           </span>
-                                         </section>
-                                         <span
-                                           className="menu_detail_header_right"
-                                           onClick={this.showTitleDetail.bind(
-                                             this,
-                                             index
+                                 {this.state.menuList.map(
+                                   (item: any, index: number) => {
+                                     return (
+                                       <li key={index}>
+                                         <header className="menu_detail_header">
+                                           <section className="menu_detail_header_left">
+                                             <strong className="menu_item_title">
+                                               {item.name}
+                                             </strong>
+                                             <span className="menu_item_description">
+                                               {item.description}
+                                             </span>
+                                           </section>
+                                           <span
+                                             className="menu_detail_header_right"
+                                             onClick={this.showTitleDetail.bind(
+                                               this,
+                                               index
+                                             )}
+                                           ></span>
+                                           {this.state.TitleDetailIndex ==
+                                           index ? (
+                                             <p className="description_tip">
+                                               <span>{item.name}</span>
+                                               {item.description}
+                                             </p>
+                                           ) : (
+                                             ""
                                            )}
-                                         ></span>
-                                         {this.state.TitleDetailIndex ==
-                                         index ? (
-                                           <p className="description_tip">
-                                             <span>{item.name}</span>
-                                             {item.description}
-                                           </p>
-                                         ) : (
-                                           ""
-                                         )}
-                                       </header>
-                                       {item.foods.map((foods, foodindex) => {
-                                         return (
-                                           <section
-                                             key={foodindex}
-                                             className="menu_detail_list"
-                                           >
-                                             <div className="menu_detail_link">
-                                               <section className="menu_food_img">
-                                                 <img
-                                                   src={
-                                                     this.state.imgBaseUrl +
-                                                     foods.image_path
-                                                   }
-                                                 />
-                                               </section>
-                                               <section className="menu_food_description">
-                                                 <h3 className="food_description_head">
-                                                   <strong className="description_foodname">
-                                                     {foods.name}
-                                                   </strong>
-                                                   {foods.attributes.length ? (
-                                                     <ul className="attributes_ul">
-                                                       {foods.attributes.map(
-                                                         (
-                                                           attribute,
-                                                           foodindex
-                                                         ) => {
-                                                           if (!attribute)
-                                                             return false;
-                                                           return (
-                                                             <li
-                                                               key={foodindex}
-                                                               className={`${
-                                                                 attribute.icon_name ===
-                                                                 "新"
-                                                                   ? "attribute_new"
-                                                                   : ""
-                                                               }`}
-                                                             >
-                                                               <p
-                                                                 style={{
-                                                                   color: `#${attribute.icon_name} === '新'?'fff':'attribute.icon_color'}`,
-                                                                 }}
-                                                               >
-                                                                 {attribute.icon_name ===
-                                                                 "新"
-                                                                   ? "新品"
-                                                                   : attribute.icon_name}
-                                                               </p>
-                                                             </li>
-                                                           );
-                                                         }
+                                         </header>
+                                         {item.foods.map(
+                                           (foods: any, foodindex: number) => {
+                                             return (
+                                               <section
+                                                 key={foodindex}
+                                                 className="menu_detail_list"
+                                               >
+                                                 <div className="menu_detail_link">
+                                                   <section className="menu_food_img">
+                                                     <img
+                                                       src={
+                                                         this.state.imgBaseUrl +
+                                                         foods.image_path
+                                                       }
+                                                     />
+                                                   </section>
+                                                   <section className="menu_food_description">
+                                                     <h3 className="food_description_head">
+                                                       <strong className="description_foodname">
+                                                         {foods.name}
+                                                       </strong>
+                                                       {foods.attributes
+                                                         .length ? (
+                                                         <ul className="attributes_ul">
+                                                           {foods.attributes.map(
+                                                             (
+                                                               attribute: any,
+                                                               foodindex: any
+                                                             ) => {
+                                                               if (!attribute)
+                                                                 return false;
+                                                               return (
+                                                                 <li
+                                                                   key={
+                                                                     foodindex
+                                                                   }
+                                                                   className={`${
+                                                                     attribute.icon_name ===
+                                                                     "新"
+                                                                       ? "attribute_new"
+                                                                       : ""
+                                                                   }`}
+                                                                 >
+                                                                   <p
+                                                                     style={{
+                                                                       color: `#${attribute.icon_name} === '新'?'fff':'attribute.icon_color'}`,
+                                                                     }}
+                                                                   >
+                                                                     {attribute.icon_name ===
+                                                                     "新"
+                                                                       ? "新品"
+                                                                       : attribute.icon_name}
+                                                                   </p>
+                                                                 </li>
+                                                               );
+                                                             }
+                                                           )}
+                                                         </ul>
+                                                       ) : (
+                                                         ""
                                                        )}
-                                                     </ul>
-                                                   ) : (
-                                                     ""
-                                                   )}
-                                                 </h3>
-                                                 <p className="food_description_content">
-                                                   {foods.description}
-                                                 </p>
-                                                 <p className="food_description_sale_rating">
-                                                   <span>
-                                                     月售{foods.month_sales}份
-                                                   </span>
-                                                   <span>
-                                                     好评率{foods.satisfy_rate}%
-                                                   </span>
-                                                 </p>
-                                                 {foods.activity ? (
-                                                   <p className="food_activity">
-                                                     <span
-                                                       style={{
-                                                         color: `#${foods.activity.image_text_color}`,
-                                                         borderColor: `#${foods.activity.icon_color}`,
-                                                       }}
-                                                     >
+                                                     </h3>
+                                                     <p className="food_description_content">
+                                                       {foods.description}
+                                                     </p>
+                                                     <p className="food_description_sale_rating">
+                                                       <span>
+                                                         月售{foods.month_sales}
+                                                         份
+                                                       </span>
+                                                       <span>
+                                                         好评率
+                                                         {foods.satisfy_rate}%
+                                                       </span>
+                                                     </p>
+                                                     {foods.activity ? (
+                                                       <p className="food_activity">
+                                                         <span
+                                                           style={{
+                                                             color: `#${foods.activity.image_text_color}`,
+                                                             borderColor: `#${foods.activity.icon_color}`,
+                                                           }}
+                                                         >
+                                                           {
+                                                             foods.activity
+                                                               .image_text
+                                                           }
+                                                         </span>
+                                                       </p>
+                                                     ) : (
+                                                       ""
+                                                     )}
+                                                   </section>
+                                                 </div>
+                                                 <footer className="menu_detail_footer">
+                                                   <section className="food_price">
+                                                     <span>¥</span>
+                                                     <span>
                                                        {
-                                                         foods.activity
-                                                           .image_text
+                                                         foods.specfoods[0]
+                                                           .price
                                                        }
                                                      </span>
-                                                   </p>
-                                                 ) : (
-                                                   ""
-                                                 )}
+                                                     {foods.specifications
+                                                       .length ? (
+                                                       <span>起</span>
+                                                     ) : (
+                                                       ""
+                                                     )}
+                                                   </section>
+                                                   <Buycar
+                                                     shopId={this.state.shopId}
+                                                     foods={foods}
+                                                     moveInCart={
+                                                       this.listenInCart
+                                                     }
+                                                     showChooseList={this.showChooseList.bind(
+                                                       this
+                                                     )}
+                                                     showReduceTip={
+                                                       this.showReduceTip
+                                                     }
+                                                     showMoveDot={
+                                                       this.showMoveDotFun
+                                                     }
+                                                   >
+                                                     {" "}
+                                                   </Buycar>
+                                                 </footer>
                                                </section>
-                                             </div>
-                                             <footer className="menu_detail_footer">
-                                               <section className="food_price">
-                                                 <span>¥</span>
-                                                 <span>
-                                                   {foods.specfoods[0].price}
-                                                 </span>
-                                                 {foods.specifications
-                                                   .length ? (
-                                                   <span>起</span>
-                                                 ) : (
-                                                   ""
-                                                 )}
-                                               </section>
-                                               <Buycar
-                                                 shopId={this.state.shopId}
-                                                 foods={foods}
-                                                 moveInCart={this.listenInCart}
-                                                 showChooseList={this.showChooseList.bind(
-                                                   this
-                                                 )}
-                                                 showReduceTip={
-                                                   this.showReduceTip
-                                                 }
-                                                 showMoveDot={
-                                                   this.showMoveDotFun
-                                                 }
-                                               >
-                                                 {" "}
-                                               </Buycar>
-                                             </footer>
-                                           </section>
-                                         );
-                                       })}
-                                     </li>
-                                   );
-                                 })}
+                                             );
+                                           }
+                                         )}
+                                       </li>
+                                     );
+                                   }
+                                 )}
                                </ul>
                              </section>
                            </section>
@@ -740,7 +755,7 @@ export default class Shop extends React.Component {
                                  >
                                    <ul>
                                      {this.state.cartFoodList.map(
-                                       (item, index) => {
+                                       (item: any, index: any) => {
                                          return (
                                            <li
                                              key={index}
@@ -831,7 +846,7 @@ export default class Shop extends React.Component {
                                </h5>
                                <ul>
                                  {this.state.choosedFoods.specifications[0].values.map(
-                                   (item, index) => {
+                                   (item: any, index: number) => {
                                      return (
                                        <li
                                          className={`${

@@ -1,11 +1,11 @@
 //about.js
-import  React from 'react';
+import  * as React from 'react';
 import './index.css';
 import ShopList from '../../components/shopList/index.jsx';
 import store from '../../redux/store';
 import Header from '../../components/header/index.jsx';
-export default class Msite extends React.Component {
-  constructor(props) {
+export default class Msite extends React.Component<any,any> {
+  constructor(props:Object) {
     super(props);
     this.state = {
       geohash: '', // city页面传递过来的地址geohash
@@ -14,10 +14,6 @@ export default class Msite extends React.Component {
       hasGetData: false, //是否已经获取地理位置数据，成功之后再获取商铺列表信息
       imgBaseUrl: 'https://fuss10.elemecdn.com', //图片域名地址
     }
-  } 
-  componentDidMount() {
-    console.log('msite_prop',this.props);
-    
   } 
   render() {
     return (
