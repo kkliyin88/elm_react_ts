@@ -15,20 +15,17 @@ import {
 import { shopDetails, foodMenu, ratingScores, ratingTags } from "../../service";
 import Buycar from "../../components/buycar/index.jsx";
 import { getImgPath } from "../../components/mixin.js";
-import * as BScroll from "better-scroll";
+import  BScroll from 'better-scroll'
 import { resolveOnChange } from "antd/lib/input/Input";
 
-// interface shop { 
-//   menuFoodList: any,
-//   wrapperMenu:any,
-//   cartContainer: any,
-//   state:any
-// }
-
 export default class Shop extends React.Component<any, any> {
+                 menuFoodList: any//React.RefObject<HTMLElement>;
+                  wrapperMenu: any// React.RefObject<HTMLElement>;
+                  cartContainer: any// React.RefObject<HTMLElement>;
+                 timer:any
                  constructor(props: any) {
                    super(props);
-                   this.menuFoodList = React.createRef();
+                   this.menuFoodList = React.createRef<HTMLElement>();
                    this.wrapperMenu = React.createRef();
                    this.cartContainer = React.createRef();
                    this.state = {
@@ -196,13 +193,12 @@ export default class Shop extends React.Component<any, any> {
                  listenInCart() {}
                  //显示提示，无法减去商品
                  showReduceTip() {
-                   this.showDeleteTip = true;
                    this.setState({
                      showDeleteTip: true,
                    });
                    clearTimeout(this.timer);
                    this.timer = setTimeout(() => {
-                     clearTimeout(this.timer);
+                     clearTimeout(Number(this.timer));
                      this.setState({
                        showDeleteTip: false,
                      });
@@ -217,7 +213,7 @@ export default class Shop extends React.Component<any, any> {
                    });
                  }
                  //显示规格列表
-                 showChooseList(foods: any) {
+                 showChooseList(foods?: any) {
                    if (foods) {
                      this.setState({
                        showSpecs: !this.state.showSpecs,
@@ -248,8 +244,8 @@ export default class Shop extends React.Component<any, any> {
                    }
                  }
                  //当滑动食品列表时，监听其scrollTop值来设置对应的食品列表标题的样式
-                 listenScroll = (element) => {
-                   let foodScroll = new BScroll(element, {
+                 listenScroll = (element:any) => {
+                   let foodScroll =new BScroll(element, {
                      probeType: 3,
                      deceleration: 0.001,
                      bounce: false,
@@ -276,10 +272,10 @@ export default class Shop extends React.Component<any, any> {
                            this.setState({
                              menuIndex: index,
                            });
-                           const menuList = this.wrapperMenu.querySelectorAll(
+                           let menuList:any = this.wrapperMenu.querySelectorAll(
                              ".activity_menu"
                            );
-                           const el = menuList[0];
+                           let el:any = menuList[0];
                            wrapperMenu.scrollToElement(
                              el,
                              800,
@@ -415,7 +411,7 @@ export default class Shop extends React.Component<any, any> {
                    }
                  }
                  //还差多少元起送，为负数时显示去结算按钮
-                 get minimumOrderAmount() {
+                 get minimumOrderAmount():any {
                    if (this.state.shopDetailData) {
                      return (
                        this.state.shopDetailData.float_minimum_order_amount -
@@ -495,12 +491,9 @@ export default class Shop extends React.Component<any, any> {
                                          )}
                                        >
                                          {item.icon_url ? (
-                                           <img
-                                             src={getImgPath.bind(
-                                               this,
-                                               item.icon_url
-                                             )}
-                                           />
+                                           ''
+                                          //  <img
+                                          //    src={getImgPath(item.icon_url)} />
                                          ) : (
                                            ""
                                          )}
@@ -829,7 +822,7 @@ export default class Shop extends React.Component<any, any> {
                            </div>
                          </section>
                        </section>
-                       <section name="fadeBounce">
+                       <section>
                          {this.state.showSpecs ? (
                            <div className="specs_list">
                              <header className="specs_list_header">
@@ -913,7 +906,7 @@ export default class Shop extends React.Component<any, any> {
                            ""
                          )}
                        </section>
-                       <section name="fade">
+                       <section >
                          {this.state.showDeleteTip ? (
                            <p className="show_delete_tip" v-if="showDeleteTip">
                              多规格商品只能去购物车删除哦
